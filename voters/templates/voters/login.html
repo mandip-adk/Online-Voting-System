@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login UI</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(90deg, #dbeafe 50%, #1e1b6a 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 900px;
+      min-width: 700px;
+      background: #ffffff;
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      transition: width 0.2s ease;
+      align-items: stretch;
+    }
+
+
+    /* LEFT SIDE */
+    .left {
+      
+      padding: clamp(30px, 5vw, 50px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      
+    }
+
+    .left,
+    .right{
+      
+      flex: 1;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e1b6a;
+      margin-bottom: 20px;
+    }
+
+    .left h2 {
+      font-size: clamp(24px,3vw,32px);
+      margin-bottom: 25px;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .divider {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .options a {
+      text-decoration: none;
+      color: #1e1b6a;
+    }
+
+    .login-btn {
+      padding: 12px;
+      background: #1e1b6a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .signup {
+      margin-top: 20px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .signup a {
+      color: #1e1b6a;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* RIGHT SIDE */
+    .right {
+      
+      background: #eaf2ff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      flex: 1;
+      
+    }
+
+    .update-box {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .update-box button {
+      margin-top: 5px;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .illustration {
+      height: auto;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- LEFT -->
+    <div class="left">
+      <div class="logo">iVote</div>
+      <h2>Welcome Back</h2>
+
+      <button class="google-btn">
+        <img src="{% static 'voters/googlelogo.jpg' %}" width="18" />
+        Log in with Google
+      </button>
+
+      <div class="divider">OR LOGIN WITH EMAIL</div>
+
+      <form method="POST" action="{% url 'login' %}">
+      
+      {% csrf_token %}
+
+      <input 
+        type="email"
+        name="email"
+        placeholder="Your Email"
+        required>
+        
+        <input 
+        type="password"
+        name="password"
+        placeholder="Your password"
+        required>
+
+      <div class="options">
+        <label>
+          <input type="checkbox"name="remember"> Keep me logged in
+        </label>
+        <a href="#">Forgot password</a>
+      </div>
+
+      <button type="submit" class="login-btn">Log in →</button>
+
+    </form>
+      <div class="signup">
+        Don't have an account yet? <a href="{% url 'register' %}">Sign up</a>
+      </div>
+    </div>
+       {% if error %}
+        <!-- Django: shows message sent from view -->
+        <p style="color:red; margin-top:10px;">
+          {{ error }}
+          <!-- Django variable passed via context -->
+        </p>
+      {% endif %}
+    </div>
+    
+
+    <!-- RIGHT -->
+    <div class="right">
+      <div class="update-box">
+        <strong>New Update Available</strong><br>
+        We have added some new awesome features<br>
+        <button>Learn More</button>
+      </div>
+
+      <img
+        class="illustration"
+        src="{% static 'voters/vote.jpg' %}"
+        alt="illustration"/>
+    </div>
+  </div>
+
+</body>
+</html>

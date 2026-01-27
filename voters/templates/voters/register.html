@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(90deg, #dbeafe 50%, #1e1b6a 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 90%;
+      max-width: 900px;
+      min-height: 540px;
+      background: #ffffff;
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* LEFT */
+    .left {
+      flex: 1;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e1b6a;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 25px;
+    }
+
+    .name-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .register-btn {
+      padding: 12px;
+      background: #1e1b6a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    .signin {
+      margin-top: 20px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .signin a {
+      color: #1e1b6a;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* RIGHT */
+    .right {
+      flex: 1;
+      background: #eaf2ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .right img {
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+    }
+
+   
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <!-- LEFT -->
+    <div class="left">
+      <div class="logo">iVote</div>
+      <h2>Create Account</h2>
+
+      <form method="POST", action="{%url 'logout' %}">
+        {% csrf_token %}
+        <div class="name-row">
+          <input type="text" name="first_name" placeholder="First Name" required>
+          <input type="text" name="last_name" placeholder="Last Name" required>
+        </div>
+
+        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button type="submit" class="register-btn">
+          Sign up →
+        </button>
+      </form>
+
+      <div class="signin">
+        Already have an account?
+        <a href="{% url 'login' %}">Log in</a>
+      </div>
+    </div>
+
+
+</body>
+</html>
