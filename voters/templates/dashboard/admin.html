@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<class="container">
+    <div class="welcome">
+      Welcome back 👋
+    </div>
+
+<div class="stats">
+      <div class="card">
+        <h3>Total Voters</h3>
+        <p>120</p>
+      </div>
+
+      <div class="card">
+        <h3>Total Candidates</h3>
+        <p>5</p>
+      </div>
+
+      <div class="card">
+        <h3>Election Status</h3>
+        <p>Active</p>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <div class="action-card">
+        <h4>Manage Voters</h4>
+        <p>Approve or remove voters from the system.</p>
+        <button>View Voters</button>
+      </div>
+
+      <div class="action-card">
+        <h4>Manage Candidates</h4>
+        <p>Add or remove candidates for the election.</p>
+        <button>View Candidates</button>
+      </div>
+
+      <div class="action-card">
+        <h4>Election Control</h4>
+        <p>Start or stop the election process.</p>
+        <button>Election Settings</button>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

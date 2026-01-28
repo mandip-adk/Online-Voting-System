@@ -120,7 +120,7 @@
       <div class="logo">iVote</div>
       <h2>Create Account</h2>
 
-      <form method="POST", action="{%url 'logout' %}">
+      <form method="POST", action="{%url 'register' %}">
         {% csrf_token %}
         <div class="name-row">
           <input type="text" name="first_name" placeholder="First Name" required>
