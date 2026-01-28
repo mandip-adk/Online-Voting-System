@@ -47,6 +47,8 @@ def dashboard(request):
 
     if user.is_superuser:
         return render(request, "dashboard/admin.html")
+    if user.profile.role == "candidate":
+        return render(request, "dashboard/candidate.html")
     
     return render(request, "dashboard/voter.html")
 
