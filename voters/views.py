@@ -3,34 +3,30 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import Election
+
 
 def login_page(request):
     if request.method == "POST":
-        identifier = request.POST.get("email")  # email OR username
+        username = request.POST.get("username")  # email OR username
         password = request.POST.get("password")
 
         user = authenticate(
             request,
-            username=identifier,
+            username=username,
             password=password
         )
 
         # If username login fails, try email
-        if user is None:
-            try:
-                user_obj = User.objects.get(email=identifier)
-                user = authenticate(
-                    request,
-                    username=user_obj.username,
-                    password=password
-                )
-            except User.DoesNotExist:
-                user = None
-
-        if user is not None:
+        if user:
             login(request, user)
-            return redirect("dashboard")
 
+            if user.is_superuser:
+                return redirect("admin_dashboard")
+            else:
+                return redirect("dashboard")
+                
         return render(
             request,
             "voters/login.html",
@@ -47,9 +43,10 @@ def dashboard(request):
 
     if user.is_superuser:
         return render(request, "dashboard/admin.html")
+    
     if user.profile.role == "candidate":
         return render(request, "dashboard/candidate.html")
-    
+      
     return render(request, "dashboard/voter.html")
 
 
@@ -70,6 +67,15 @@ def register(request):
         user.save()
         return redirect("login")
     return render(request, "voters/register.html")
+
+
+@staff_member_required
+def admin_dashboard(request):
+    elections = Election.objects.all()
+    return render(request, "dashboard/admin.html", {
+        "elections": elections
+    })
+
 
 def logout_view(request):
     logout(request)

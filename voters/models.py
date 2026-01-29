@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     role_choice = (
-        ("voter", "voter"),
-        ("candidate", "candidate"),
+        ("admin", "Admin"),
+        ("voter", "Voter"),
+        ("candidate", "Candidate"),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -12,7 +13,7 @@ class Profile(models.Model):
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {self.role}"
     
 
 class Election(models.Model):
