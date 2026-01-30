@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Election
+from django.utils import timezone
 
 
 def login_page(request):
@@ -71,10 +72,49 @@ def register(request):
 
 @staff_member_required
 def admin_dashboard(request):
-    elections = Election.objects.all()
+    total_voters = User.objects.filter(profile__role= "voter").count()
+    total_candidates = User.objects.filter(profile__role="candidate").count()
+
+    active_election = Election.objects.filter(
+        start_date__lte = timezone.now(),
+        end_date__gte = timezone.now()
+    ).first()
+
+    election_status = "Active" if active_election else "Inactive"
+
     return render(request, "dashboard/admin.html", {
+        "total_voters": total_voters,
+        "total_candidate": total_candidates,
+        "election_status": election_status,
+        "active_election": active_election,
+
+    })
+
+
+@staff_member_required
+def admin_voters(request):
+    voters = User.objects.filter(profile__role="voter")
+    return render(request, "dashboard/admin_voters.html", {
+        "voters": voters
+    })
+
+@staff_member_required
+def admin_candidates(request):
+    candidates = User.objects.filter(profile__role="candidate")
+    return render(request, "dashboard/admin_candidates.html", {
+        "candidates":candidates
+    })
+
+@staff_member_required
+def admin_elections(request):
+    elections = Election.objects.all()
+    return render(request, "dashboard/admin_elections.html",{
         "elections": elections
     })
+
+@staff_member_required
+def admin_results(request):
+    return render(request, "dashboard/admin_result.html")
 
 
 def logout_view(request):
