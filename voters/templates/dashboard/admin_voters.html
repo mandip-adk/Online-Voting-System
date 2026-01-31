@@ -1,1 +1,43 @@
-<h2>Coming soon 🚧</h2>
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2>Manage Voters</h2>
+<table style="width:100%; margin-top:20px;">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for profile in voters %}
+    <tr>
+      <td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
+      <td>{{ profile.user.email }}</td>
+
+      <td>
+        {% if profile.is_approved %}
+          ✅ Approved
+        {% else %}
+          ❌ Blocked
+        {% endif %}
+      </td>
+
+      <td>
+        {% if profile.is_approved %}
+          <a href="{% url 'block_voter' profile.id %}">Block</a>
+        {% else %}
+          <a href="{% url 'approve_voter' profile.id %}">Approve</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="4">No voters found</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

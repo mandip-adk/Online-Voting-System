@@ -12,6 +12,12 @@ urlpatterns=[
     path("admin/voters/", admin_voters, name="admin_voters"),
     path("admin/candidates/", admin_candidates, name="admin_candidates"),
     path("admin/results/", admin_results, name="admin_results"),
-    path("admin/elections/", admin_elections, name= "admin_elections")
+    path("admin/elections/", admin_elections, name= "admin_elections"),
+    
+
+    path("dashboard/admin/voters/", views.admin_voters, name="admin_voters"),
+    path("dashboard/admin/voters/approve/<int:profile_id>/", views.approve_voter, name="approve_voter"),
+    path("dashboard/admin/voters/block/<int:profile_id>/", views.block_voter, name="block_voter"),
+
     
 ]

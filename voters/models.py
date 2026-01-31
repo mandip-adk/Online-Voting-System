@@ -10,7 +10,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=role_choice, default="voter")
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"

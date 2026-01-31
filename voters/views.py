@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from .models import Election
+from .models import Election, Profile
 from django.utils import timezone
 
 
@@ -93,7 +93,7 @@ def admin_dashboard(request):
 
 @staff_member_required
 def admin_voters(request):
-    voters = User.objects.filter(profile__role="voter")
+    voters = Profile.objects.filter(role="voter").select_related("user")
     return render(request, "dashboard/admin_voters.html", {
         "voters": voters
     })
@@ -114,8 +114,21 @@ def admin_elections(request):
 
 @staff_member_required
 def admin_results(request):
-    return render(request, "dashboard/admin_result.html")
+    return render(request, "dashboard/admin_results.html")
 
+@staff_member_required
+def approve_voter(request, profile_id):
+    profile = Profile.objects.get(id=profile_id)
+    profile.is_approved = True
+    profile.save()
+    return redirect("admin_voters")
+
+@staff_member_required
+def block_voter(request, profile_id):
+    profile = Profile.objects.get(id=profile_id)
+    profile.is_approved = False
+    profile.save()
+    return redirect("admin_voters") 
 
 def logout_view(request):
     logout(request)
