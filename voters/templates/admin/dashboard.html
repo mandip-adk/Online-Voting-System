@@ -1,0 +1,57 @@
+{% extends "layout/base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="welcome">
+    Welcome Admin 👋
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="card">
+      <h3>Total Voters</h3>
+      <p>{{ total_voters }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Total Candidates</h3>
+      <p>{{ total_candidates }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Election Status</h3>
+      <p>{{ election_status }}</p>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <div class="action-card">
+      <h4>Manage Voters</h4>
+      <p>Approve or remove voters.</p>
+      <a href="{% url 'admin_voters' %}" class="btn">View Voters</a>
+    </div>
+
+    <div class="action-card">
+      <h4>Manage Candidates</h4>
+      <p>Add or remove candidates.</p>
+      <a href="{% url 'admin_candidates' %}" class="btn">View Candidates</a>
+    </div>
+
+    <div class="action-card">
+      <h4>Election Settings</h4>
+      <p>Start or stop elections.</p>
+      <a href="{% url 'admin_elections' %}" class="btn">Election Settings</a>
+    </div>
+
+    <div class="action-card">
+      <h4>View Results</h4>
+      <p>Check election results.</p>
+      <a href="{% url 'admin_results' %}" class="btn">View Results</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

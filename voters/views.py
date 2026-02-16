@@ -25,49 +25,43 @@ def login_page(request):
 
             if user.is_superuser:
                 return redirect("admin_dashboard")
-            else:
-                return redirect("dashboard")
-                
-        return render(
-            request,
-            "voters/login.html",
-            {"error": "Invalid email or password"},
-        )
 
-    return render(request, "voters/login.html")
+            if user.profile.role == "candidate":
+                return redirect("candidate_dashboard")
 
+            return redirect("voter_dashboard")
+
+        return render(request, "auth/login.html", {
+            "error": "Invalid email or password"
+        })
+
+    return render(request, "auth/login.html")
 
 
 @login_required
-def dashboard(request):
-    user = request.user
+def voter_dashboard(request):
+    return render(request, "voter/dashboard.html")
 
-    if user.is_superuser:
-        return render(request, "dashboard/admin.html")
-    
-    if user.profile.role == "candidate":
-        return render(request, "dashboard/candidate.html")
-      
-    return render(request, "dashboard/voter.html")
+
+@login_required
+def candidate_dashboard(request):
+    return render(request, "candidate/dashboard.html")
 
 
 def register(request):
     if request.method == "POST":
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
         user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password
+            username=request.POST.get("email"),
+            email=request.POST.get("email"),
+            password=request.POST.get("password"),
         )
-        user.first_name = first_name
-        user.last_name = last_name
+        user.first_name = request.POST.get("first_name")
+        user.last_name = request.POST.get("last_name")
         user.save()
+
         return redirect("login")
-    return render(request, "voters/register.html")
+
+    return render(request, "auth/register.html")
 
 
 @staff_member_required
@@ -82,10 +76,10 @@ def admin_dashboard(request):
 
     election_status = "Active" if active_election else "Inactive"
 
-    return render(request, "dashboard/admin.html", {
+    return render(request, "admin/dashboard.html", {
         "total_voters": total_voters,
         "total_candidate": total_candidates,
-        "election_status": election_status,
+        "election_status": "Active" if active_election else "Inactive",
         "active_election": active_election,
 
     })
@@ -94,27 +88,27 @@ def admin_dashboard(request):
 @staff_member_required
 def admin_voters(request):
     voters = Profile.objects.filter(role="voter").select_related("user")
-    return render(request, "dashboard/admin_voters.html", {
+    return render(request, "admin/manage_voters.html", {
         "voters": voters
     })
 
 @staff_member_required
 def admin_candidates(request):
     candidates = User.objects.filter(profile__role="candidate")
-    return render(request, "dashboard/admin_candidates.html", {
+    return render(request, "admin/manage_candidates.html", {
         "candidates":candidates
     })
 
 @staff_member_required
 def admin_elections(request):
     elections = Election.objects.all()
-    return render(request, "dashboard/admin_elections.html",{
+    return render(request, "admin/manage_elections.html",{
         "elections": elections
     })
 
 @staff_member_required
 def admin_results(request):
-    return render(request, "dashboard/admin_results.html")
+    return render(request, "admin/manage_results.html")
 
 @staff_member_required
 def approve_voter(request, profile_id):

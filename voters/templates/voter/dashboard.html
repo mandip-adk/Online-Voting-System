@@ -1,0 +1,46 @@
+{% extends "layout/base.html" %}
+{% block title %}Voter Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="welcome">
+    Welcome Voter 👋
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <h3>Election Status</h3>
+      <p>{{ election_status }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Your Vote</h3>
+      <p>
+        {% if has_voted %}
+          Already Voted ✅
+        {% else %}
+          Not Voted ❌
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="actions">
+    {% if election_status == "Active" and not has_voted %}
+    <div class="action-card">
+      <h4>Cast Your Vote</h4>
+      <p>Participate in the election.</p>
+      <a href="{% url 'vote' %}" class="btn">Vote Now</a>
+    </div>
+    {% endif %}
+
+    <div class="action-card">
+      <h4>View Candidates</h4>
+      <p>See who is contesting.</p>
+      <a href="{% url 'candidate_list' %}" class="btn">View Candidates</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

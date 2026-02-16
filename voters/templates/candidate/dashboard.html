@@ -1,0 +1,38 @@
+{% extends "layout/base.html" %}
+{% block title %}Candidate Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="welcome">
+    Welcome Candidate 👋
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <h3>Election Status</h3>
+      <p>{{ election_status }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Total Votes</h3>
+      <p>{{ total_votes }}</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="action-card">
+      <h4>Your Profile</h4>
+      <p>View your candidate details.</p>
+      <a href="{% url 'candidate_profile' %}" class="btn">View Profile</a>
+    </div>
+
+    <div class="action-card">
+      <h4>Election Results</h4>
+      <p>Track your performance.</p>
+      <a href="{% url 'candidate_results' %}" class="btn">View Results</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
