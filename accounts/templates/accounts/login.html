@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+  <title>iVOTE — Sign In</title>
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+ {% endblock %}
+
+ {% block content %}
+  <div div class="auth-layout">
+ 
+    <!-- ── Left Panel ── -->
+    <div class="auth-panel-left">
+      <div class="float-shape" style="width:300px;height:300px;top:-80px;right:-80px;animation-delay:0s;"></div>
+      <div class="float-shape" style="width:200px;height:200px;bottom:-40px;left:-40px;animation-delay:3s;"></div>
+      <div class="float-shape" style="width:120px;height:120px;top:45%;left:10%;animation-delay:1.5s;"></div>
+ 
+      <a href="#" class="auth-brand">
+        <div class="auth-brand-logo">
+          <span>i</span>V
+        </div>
+        <span><em>i</em>VOTE</span>
+      </a>
+ 
+      <div class="auth-left-content">
+        <h2 class="auth-left-title">Welcome back!</h2>
+        <p class="auth-left-sub">
+          Sign in to access your voter dashboard, cast your vote, and monitor live election results in real time.
+        </p>
+        <div class="auth-left-steps">
+          <div class="auth-step">
+            <div class="step-icon step-green">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="step-title">Verified Identity</div>
+              <div class="step-sub">Your account is secured and verified</div>
+            </div>
+          </div>
+          <div class="auth-step">
+            <div class="step-icon step-blue">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+              </svg>
+            </div>
+            <div>
+              <div class="step-title">Cast Your Vote</div>
+              <div class="step-sub">One vote per eligible voter, guaranteed</div>
+            </div>
+          </div>
+          <div class="auth-step">
+            <div class="step-icon step-orange">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="step-title">Live Results</div>
+              <div class="step-sub">Track election outcomes in real time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+ 
+    <!-- ── Right Panel (Form) ── -->
+    <div class="auth-panel-right">
+      <div class="auth-form-container">
+ 
+ 
+        <div class="auth-logo-mobile">
+          <div class="brand-logo" style="width:44px;height:44px;background:var(--primary);color:#fff;border:none;font-size:1.1rem;"><span>i</span>V</div>
+        </div>
+ 
+        <h1 class="auth-title">Sign In</h1>
+        <p class="auth-subtitle">Enter your credentials to access your voter account.</p>
+ 
+    <form method="POST" class="auth-form">
+  {% csrf_token %}
+  
+  <div class="form-group mt-4">
+    <label class="form-label">Username</label>
+    <div class="input-wrapper">
+      {{ form.username }}
+    </div>
+  </div>
+
+  <div class="form-group mt-4">
+    <label class="form-label">Password</label>
+    <div class="input-wrapper">
+      {{ form.password }}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-full btn-lg mt-6">
+    Sign In to iVOTE
+  </button>
+</form>
+
+   <p class="auth-switch mt-6 text-center">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="auth-switch-link">Register here</a>
+        </p>
+    </div>
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+  <title>iVOTE — Register as a Voter</title>
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/register.css' %}" />
+{% endblock%}
+
+{% block content %}
+  <div class="auth-layout register-layout">
+ 
+    <!-- ── Left Panel ── -->
+    <div class="auth-panel-left">
+      <div class="float-shape" style="width:280px;height:280px;top:-70px;left:-70px;animation-delay:0s;"></div>
+      <div class="float-shape" style="width:180px;height:180px;bottom:-30px;right:-30px;animation-delay:2s;"></div>
+      <div class="float-shape" style="width:100px;height:100px;top:55%;right:15%;animation-delay:1s;"></div>
+ 
+      <a href="#" class="auth-brand">
+        <div class="auth-brand-logo"><span>i</span>V</div>
+        <span><em>i</em>VOTE</span>
+      </a>
+ 
+      <div class="auth-left-content">
+        <h2 class="auth-left-title">Join iVOTE today.</h2>
+        <p class="auth-left-sub">
+          Register in minutes and be ready to participate in secure, transparent elections from any device.
+        </p>
+ 
+        <div class="register-steps">
+          <div class="reg-step">
+            <div class="reg-step-num">01</div>
+            <div class="reg-step-info">
+              <div class="step-title">Fill in your details</div>
+              <div class="step-sub">Name, email, and contact info</div>
+            </div>
+          </div>
+          <div class="reg-step-line"></div>
+          <div class="reg-step">
+            <div class="reg-step-num">02</div>
+            <div class="reg-step-info">
+              <div class="step-title">Verify your identity</div>
+              <div class="step-sub">Submit valid government ID</div>
+            </div>
+          </div>
+          <div class="reg-step-line"></div>
+          <div class="reg-step">
+            <div class="reg-step-num">03</div>
+            <div class="reg-step-info">
+              <div class="step-title">Get your Voter ID</div>
+              <div class="step-sub">Receive credentials via email</div>
+            </div>
+          </div>
+          <div class="reg-step-line"></div>
+          <div class="reg-step">
+            <div class="reg-step-num">04</div>
+            <div class="reg-step-info">
+              <div class="step-title">Start Voting!</div>
+              <div class="step-sub">Participate in active elections</div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="auth-preview-card">
+        <div class="apc-label">Your Future Dashboard</div>
+        <div class="apc-title">Hello, New Voter! 👋</div>
+        <div class="apc-meta">
+          <span class="live-dot"></span>
+          <span>3 elections available to vote in</span>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ── Right Panel (Form) ── -->
+    <div class="auth-panel-right reg-panel-right">
+      <div class="auth-form-container reg-form-container">
+ 
+        
+ 
+        <div class="auth-logo-mobile">
+          <div class="brand-logo" style="width:44px;height:44px;background:var(--primary);color:#fff;border:none;font-size:1.1rem;"><span>i</span>V</div>
+        </div>
+ 
+    <h1 class="auth-title mt-6">Register as a Voter</h1>
+    <p class="auth-subtitle">Create your iVOTE account to participate in elections.</p>
+
+<form method="POST" class="auth-form">
+  {% csrf_token %}
+
+  <div class="form-group mt-4">
+    <label class="form-label">Username</label>
+    <div class="input-wrapper">
+      {{ form.username }}
+    </div>
+  </div>
+
+  <div class="form-row mt-4">
+    <div class="form-group">
+      <label class="form-label">First name</label>
+      <div class="input-wrapper">{{ form.first_name }}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Last name</label>
+      <div class="input-wrapper">{{ form.last_name }}</div>
+    </div>
+  </div>
+
+  <div class="form-group mt-4">
+    <label class="form-label">Email</label>
+    <div class="input-wrapper">{{ form.email }}</div>
+  </div>
+
+  <div class="form-group mt-4">
+    <label class="form-label">Password</label>
+    <div class="input-wrapper">{{ form.password1 }}</div>
+  </div>
+
+  <div class="form-group mt-4">
+    <label class="form-label">Confirm password</label>
+    <div class="input-wrapper">{{ form.password2 }}</div>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-full btn-lg mt-6">
+    Create My Account
+  </button>
+</form>
+</div>
+</div>
+</div>
+ {% endblock %}
