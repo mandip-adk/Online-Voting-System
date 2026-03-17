@@ -77,7 +77,7 @@
         <h1 class="auth-title">Sign In</h1>
         <p class="auth-subtitle">Enter your credentials to access your voter account.</p>
  
-    <form method="POST" class="auth-form">
+    <form method="POST" action="{% url 'login' %}" class="auth-form">
   {% csrf_token %}
   
   <div class="form-group mt-4">

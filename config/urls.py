@@ -24,6 +24,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', include('accounts.urls')),
     #path('audit/', include('audit.urls')),
-    #path('voting/', include('voting.urls')),
+    path('voting/', include('voting.urls')),
 
 ]

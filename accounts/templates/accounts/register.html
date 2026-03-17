@@ -84,8 +84,18 @@
     <h1 class="auth-title mt-6">Register as a Voter</h1>
     <p class="auth-subtitle">Create your iVOTE account to participate in elections.</p>
 
-<form method="POST" class="auth-form">
+<form method="POST" action="{% url 'register' %}" class="auth-form">
   {% csrf_token %}
+
+  {% if form.errors %}
+  <div style="color:red; margin-bottom:10px;">
+    {% for field in form %}
+      {% for error in field.errors %}
+        <p>{{ field.label }}: {{ error }}</p>
+      {% endfor %}
+    {% endfor %}
+  </div>
+{% endif %}
 
   <div class="form-group mt-4">
     <label class="form-label">Username</label>

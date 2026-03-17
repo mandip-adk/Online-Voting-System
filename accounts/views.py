@@ -9,6 +9,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.error(request, "Account created successfully. ")
             return redirect('login')
         else:
             messages.error(request, "Invalid information please check and provided correct data.")
