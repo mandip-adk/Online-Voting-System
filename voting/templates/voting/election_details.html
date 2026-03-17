@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/elections.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="{% url 'voting:elections' %}" class="bc-link">Elections</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="bc-current">{{ election.title }}</span>
+  </div>
+
+  <!-- ELECTION HERO BANNER -->
+  <div class="detail-hero">
+    <div class="detail-hero-left">
+
+      <div class="detail-status-badge badge-{{ election.status }}">
+        <span class="status-dot dot-{{ election.status }}"></span>
+        {{ election.get_status_display }}
+      </div>
+
+      <h1 class="detail-title">{{ election.title }}</h1>
+      <p class="detail-created">
+        Created by <strong>{{ election.created_by.get_full_name|default:election.created_by.username }}</strong>
+      </p>
+
+      <div class="detail-date-row">
+        <div class="detail-date-box">
+          <span class="ddb-label">Start Date</span>
+          <span class="ddb-value">{{ election.start_date|date:"F d, Y · g:i A" }}</span>
+        </div>
+        <div class="detail-date-arrow">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </div>
+        <div class="detail-date-box">
+          <span class="ddb-label">End Date</span>
+          <span class="ddb-value">{{ election.end_date|date:"F d, Y · g:i A" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS COLUMN -->
+    <div class="detail-hero-stats">
+      <div class="dhs-card">
+        <div class="dhs-num">{{ election.candidates.count }}</div>
+        <div class="dhs-label">Candidates</div>
+      </div>
+      <div class="dhs-card">
+        <div class="dhs-num">{{ election.votes.count }}</div>
+        <div class="dhs-label">Total Votes</div>
+      </div>
+      <div class="dhs-card">
+        <div class="dhs-num">{{ election.participations.count }}</div>
+        <div class="dhs-label">Voters Participated</div>
+      </div>
+      <div class="dhs-card dhs-highlight">
+        <div class="dhs-num">{{ turnout_pct }}%</div>
+        <!-- pass turnout_pct from view: round(participations/total_registered*100) -->
+        <div class="dhs-label">Voter Turnout</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOTER STATUS BANNER -->
+  {% if has_voted %}
+  <div class="voting-status-block voted">
+    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div>
+      <div class="vsb-title">Vote Submitted</div>
+      <div class="vsb-sub">Your vote has been recorded securely</div>
+    </div>
+  </div>
+
+  {% elif election.status == 'active' %}
+    <div class="voter-banner banner-vote-now">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+      </svg>
+      <div><strong>Voting is now open!</strong> Select a candidate below and cast your vote.</div>
+      <a href="{% url 'voting:cast_vote' election.pk %}" class="btn btn-primary btn-sm" style="margin-left:auto;flex-shrink:0;">
+        Cast Your Vote →
+      </a>
+    </div>
+
+  {% elif election.status == 'pending' %}
+    <div class="voter-banner banner-pending">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <strong>Voting hasn't opened yet.</strong>
+        This election opens on {{ election.start_date|date:"F d, Y · g:i A" }}.
+      </div>
+    </div>
+
+  {% else %}
+    <div class="voter-banner banner-closed">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+      </svg>
+      <div>
+        <strong>This election is closed.</strong>
+        Voting ended on {{ election.end_date|date:"F d, Y · g:i A" }}.
+      </div>
+      <a href="{% url 'voting:result' election.pk %}" class="btn btn-ghost btn-sm" style="margin-left:auto;flex-shrink:0;">
+        View Final Results →
+      </a>
+    </div>
+  {% endif %}
+
+  <!-- CONTENT GRID -->
+  <div class="detail-content-grid">
+
+    <!-- CANDIDATES SECTION -->
+    <section class="detail-main">
+      <div class="section-subheader">
+        <h2 class="section-subtitle">Candidates</h2>
+        <span class="section-count">
+          {{ election.candidates.count }} candidate{{ election.candidates.count|pluralize }}
+        </span>
+      </div>
+
+      <div class="candidates-list">
+        {% for candidate in candidates %}
+          <div class="candidate-detail-card">
+
+            <div class="cdc-left">
+              {% if candidate.photo_url %}
+                <img src="{{ candidate.photo_url }}" class="cdc-avatar" alt="{{ candidate.user.get_full_name }}" style="object-fit:cover;" />
+              {% else %}
+                <div class="cdc-avatar">
+                  {{ candidate.user.first_name|slice:":1" }}{{ candidate.user.last_name|slice:":1" }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="cdc-body">
+              <h3 class="cdc-name">{{ candidate.user.get_full_name|default:candidate.user.username }}</h3>
+              <p class="cdc-username">@{{ candidate.user.username }}</p>
+              <p class="cdc-bio">{{ candidate.bio|default:"No biography provided." }}</p>
+            </div>
+
+            <div class="cdc-right">
+              {% if election.status == 'active' and not has_voted %}
+                <a href="{% url 'voting:cast_vote' election.pk %}?candidate={{ candidate.pk }}"
+                   class="btn btn-primary btn-sm">Vote →</a>
+              {% elif has_voted %}
+                <span class="badge badge-success">Voted</span>
+              {% endif %}
+            </div>
+
+          </div>
+        {% empty %}
+          <p style="color:var(--text-muted);font-size:.9rem;">No candidates registered yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- SIDEBAR -->
+    <aside class="detail-sidebar">
+
+      <!-- VOTING STATUS WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Your Voting Status</h3>
+        {% if has_voted %}
+          <div class="voting-status-block voted">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+              <div class="vsb-title">Vote Submitted</div>
+              <div class="vsb-sub">{{ voter_participation.voted_at|date:"M d · g:i A" }}</div>
+            </div>
+          </div>
+        {% elif election.status == 'active' %}
+          <div class="voting-status-block pending">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+              <div class="vsb-title">Not Yet Voted</div>
+              <div class="vsb-sub">Cast your vote before it closes</div>
+            </div>
+          </div>
+        {% else %}
+          <div class="voting-status-block pending">
+            <div>
+              <div class="vsb-title">{{ election.get_status_display }}</div>
+              <div class="vsb-sub">
+                {% if election.status == 'pending' %}Opens {{ election.start_date|date:"M d, Y" }}
+                {% else %}Closed {{ election.end_date|date:"M d, Y" }}{% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ELECTION INFO WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Election Info</h3>
+        <div class="info-rows">
+          <div class="info-row">
+            <span class="ir-label">Status</span>
+            <span class="ir-value">
+              <span class="badge badge-{{ election.status }}" style="font-size:.75rem">
+                {{ election.get_status_display }}
+              </span>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Created by</span>
+            <span class="ir-value">{{ election.created_by.get_full_name|default:election.created_by.username }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Opens</span>
+            <span class="ir-value">{{ election.start_date|date:"M d, Y" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Closes</span>
+            <span class="ir-value">{{ election.end_date|date:"M d, Y" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Votes cast</span>
+            <span class="ir-value">{{ election.votes.count }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Candidates</span>
+            <span class="ir-value">{{ election.candidates.count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS LINK WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Live Results</h3>
+        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:14px;">
+          Results are updated in real time as votes come in.
+        </p>
+        <a href="{% url 'voting:result' election.pk %}" class="btn btn-primary btn-full">
+          View Live Results →
+        </a>
+      </div>
+
+    </aside>
+  </div>
+
+</main>
+{% endblock %}
