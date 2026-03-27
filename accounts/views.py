@@ -3,6 +3,9 @@ from .forms import RegisterForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from voting.models import Election, VoterParticipation
+
 
 def register(request):
     if request.method == 'POST':
@@ -45,3 +48,37 @@ def logout_view(request):
 
 def home(request):
     return render(request, 'home.html')
+
+
+@login_required
+def voter_dashboard(request):
+    if request.user.role == 'voter':
+        active_elections = Election.objects.filter(status='active')
+        election_with_status= []
+        voted_count = pending_count = complete_count = 0
+    
+        for election in active_elections:
+
+            has_voted = VoterParticipation.objects.filter(
+                user =request.user,
+                election =election
+                ).exists()
+            election_with_status.append({'election': election,
+                                        'has_voted': has_voted})
+            
+            if has_voted:
+                voted_count += 1
+            if election.status == 'active' and not has_voted:
+                pending_count += 1
+            if election.status == 'closed' and not has_voted:
+                complete_count += 1
+
+        return render(request, 'voting/dashboard/voter_dashboard.html', {
+            'election_with_status': election_with_status,
+            'voted_count': voted_count,
+            'pending_count': pending_count,
+            'complete_count': complete_count
+            })
+    else:
+        return redirect('home')
+
