@@ -204,3 +204,21 @@
   .der-right { width: 100%; justify-content: flex-end; }
   .dash-name { font-size: 1.3rem; }
 }
+
+/* ── Candidate vote badge ── */
+.cand-votes-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(245,158,11,.1);
+  color: #D97706;
+  border-radius: 50px;
+  font-family: var(--font-head);
+  font-size: .8rem;
+  font-weight: 600;
+}
+.cand-votes-active {
+  background: rgba(58,79,215,.1);
+  color: var(--primary);
+}

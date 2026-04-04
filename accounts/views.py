@@ -4,7 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from voting.models import Election, VoterParticipation
+from voting.models import Election, VoterParticipation, Candidate, Votes
+from django.db.models import Count
 
 
 def register(request):
@@ -53,7 +54,7 @@ def home(request):
 @login_required
 def voter_dashboard(request):
     if request.user.role == 'voter':
-        active_elections = Election.objects.filter(status='active')
+        active_elections = Election.objects.all()
         election_with_status= []
         voted_count = pending_count = complete_count = 0
     
@@ -77,8 +78,39 @@ def voter_dashboard(request):
             'election_with_status': election_with_status,
             'voted_count': voted_count,
             'pending_count': pending_count,
-            'complete_count': complete_count
+            'completed_count': complete_count
             })
     else:
         return redirect('home')
+    
+@login_required
+def candidate_dashboard(request):
+    if request.user.role != 'candidate':
+        return redirect('home')
+    
+    else:
+
+        elections = Election.objects.filter(candidates__user =request.user )
+        election_with_votes = []
+        total_votes = 0
+        for election in elections:
+            candidate = Candidate.objects.get(user = request.user, election= election)
+
+            votes_received = Votes.objects.filter(candidate=candidate).count()
+            total_votes+= votes_received
+
+            election_with_votes.append({
+                'election':election,
+                'votes_received': votes_received
+            })
+        return render(request, 'voting/dashboard/candidate_dashboard.html', {
+            'election_with_votes': election_with_votes,
+            'total_elections': elections.count(),
+            'active_elections': elections.filter(status='active').count(),
+            'closed_elections': elections.filter(status='closed').count(),
+            'total_votes': total_votes,
+        })
+
+        
+
 

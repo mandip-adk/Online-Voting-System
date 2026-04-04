@@ -78,7 +78,7 @@
         <p class="auth-subtitle">Enter your credentials to access your voter account.</p>
  
     <form method="POST" action="{% url 'login' %}" class="auth-form">
-  {% csrf_token %}
+        {% csrf_token %}
   {% if form.errors %}
   <div style="color:red; margin-bottom:10px;">
     {% for error in form.non_field_errors %}
