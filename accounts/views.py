@@ -5,6 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from voting.models import Election, VoterParticipation, Candidate, Votes
+from .models import CustomUser
 from django.db.models import Count
 
 
@@ -112,5 +113,35 @@ def candidate_dashboard(request):
         })
 
         
+@login_required
+def admin_dashboard(request):
+    if request.user.role != 'admin':
+        return redirect ('home')
+    else:
+        total_user = CustomUser.objects.count()
+        total_election = Election.objects.count()
+        total_voters = CustomUser.objects.filter(role= 'voter').count()
+        total_candidates = CustomUser.objects.filter(role='candidate').count()
+        total_vote_cast = Votes.objects.count()
+        elections = Election.objects.all()
+        election_with_vote_count= []
+
+        for election in elections:
+            vote_count = Votes.objects.filter(election=election).count()
+            election_with_vote_count.append({
+                'election':election,
+                'vote_count': vote_count
+            })
+        
+        return render(request, 'voting/dashboard/admin_dashboard.html',{
+            'total_user':total_user,
+            'total_election':total_election,
+            'total_voters':total_voters,
+            'total_candidates': total_candidates,
+            'total_vote_cast': total_vote_cast,
+            'election_with_vote_count': election_with_vote_count,
+        })
+
+
 
 
