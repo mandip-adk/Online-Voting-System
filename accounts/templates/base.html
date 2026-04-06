@@ -7,44 +7,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>iVOTE</title>
   <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-{% block head %}{% endblock %}
+  {% block head %}{% endblock %}
 </head>
 <body>
 
- <!-- ── Navbar ── -->
+  <!-- ── Navbar ── -->
   <nav class="navbar">
-    <a href="#" class="navbar-brand">
+    <a href="{% url 'home' %}" class="navbar-brand">
       <div class="brand-logo"><span>i</span>V</div>
-      <span class="logo-text"><span class="i-part">i</span>VOTE</span>
+      <span class="logo-text"><em>i</em>VOTE</span>
     </a>
+
     <ul class="navbar-nav">
-      <li><a href="{% url 'home' %}"  class="nav-link active">Home</a></li>
-      <li><a href="#"     class="nav-link">About</a></li>
-      <li><a href="#"   class="nav-link">Contact Us</a></li>
+      <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+      <li><a href="#"               class="nav-link">About</a></li>
+      <li><a href="#"               class="nav-link">Contact Us</a></li>
     </ul>
+
     <div class="navbar-actions">
-      <a href="{% url 'login' %}"    class="btn btn-ghost btn-sm" style="color:#fff;background:rgba(255,255,255,.15);">Log In</a>
-      <a href="{% url 'register' %}" class="btn btn-primary btn-sm" style="background:#fff;color:var(--primary);">Register</a>
+      {% if user.is_authenticated %}
+
+        <!-- Dashboard link based on role -->
+        {% if user.role == 'admin' %}
+          <a href="{% url 'admin_dashboard' %}"
+             class="btn btn-ghost btn-sm"
+             style="color:#fff;background:rgba(255,255,255,.15);">
+            Dashboard
+          </a>
+        {% elif user.role == 'candidate' %}
+          <a href="{% url 'candidate_dashboard' %}"
+             class="btn btn-ghost btn-sm"
+             style="color:#fff;background:rgba(255,255,255,.15);">
+            Dashboard
+          </a>
+        {% else %}
+          <a href="{% url 'voter_dashboard' %}"
+             class="btn btn-ghost btn-sm"
+             style="color:#fff;background:rgba(255,255,255,.15);">
+            Dashboard
+          </a>
+        {% endif %}
+
+        <a href="{% url 'logout' %}"
+           class="btn btn-primary btn-sm"
+           style="background:#fff;color:var(--primary);">
+          Log Out
+        </a>
+
+      {% else %}
+        <a href="{% url 'login' %}"
+           class="btn btn-ghost btn-sm"
+           style="color:#fff;background:rgba(255,255,255,.15);">
+          Log In
+        </a>
+        <a href="{% url 'register' %}"
+           class="btn btn-primary btn-sm"
+           style="background:#fff;color:var(--primary);">
+          Register
+        </a>
+      {% endif %}
     </div>
   </nav>
 
-{% block content %}
+  <!-- ── Django Messages ── -->
+  {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+          <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-{% if messages %}
-  <div class="messages">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
+  <!-- ── Page Content ── -->
+  {% block content %}{% endblock %}
 
-{% endblock %}
-
- <!-- ── Footer ── -->
+  <!-- ── Footer ── -->
   <footer class="footer">
-
+    <div class="footer-inner">
+      <div class="navbar-brand" style="color:var(--text-secondary);">
+        <div class="brand-logo" style="background:var(--primary);color:#fff;border:none;">
+          <span>i</span>V
+        </div>
+        <span class="logo-text" style="color:var(--text-primary);"><em>i</em>VOTE</span>
+      </div>
       <p class="footer-copy">© 2024 iVOTE Online Voting System. All rights reserved.</p>
       <div class="footer-links">
         <a href="#" class="footer-link">Privacy Policy</a>
@@ -55,5 +103,4 @@
   </footer>
 
 </body>
-
 </html>

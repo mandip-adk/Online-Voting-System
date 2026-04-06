@@ -1,0 +1,287 @@
+/* ── Audit Election Summary Bar ── */
+.audit-election-summary {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 28px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.aes-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 100px;
+}
+.aes-label {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-muted);
+  font-family: var(--font-head);
+}
+.aes-value {
+  font-family: var(--font-head);
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.aes-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ── Audit Form Card ── */
+.audit-form-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+}
+.audit-form-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Make Django textarea match the design */
+.audit-form-card textarea {
+  width: 100%;
+  padding: 13px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: .95rem;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: #FAFBFF;
+  resize: vertical;
+  min-height: 140px;
+  outline: none;
+  transition: var(--transition);
+}
+.audit-form-card textarea:focus {
+  border-color: var(--primary-light);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(58,79,215,.1);
+}
+.audit-form-card input[type="text"],
+.audit-form-card input[type="email"],
+.audit-form-card select {
+  width: 100%;
+  padding: 13px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: .95rem;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: #FAFBFF;
+  outline: none;
+  transition: var(--transition);
+}
+.audit-form-card input:focus,
+.audit-form-card select:focus {
+  border-color: var(--primary-light);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(58,79,215,.1);
+}
+
+/* Action buttons row */
+.audit-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* ── Audit Status Badges ── */
+.audit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-family: var(--font-head);
+  font-size: .75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.audit-pending  { background: rgba(245,158,11,.12); color: #D97706; }
+.audit-approved { background: rgba(16,185,129,.12); color: #059669; }
+.audit-rejected { background: rgba(239,68,68,.12);  color: #DC2626; }
+
+/* ── Audit reason text ── */
+.audit-reason-text {
+  font-size: .85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+.audit-read-more {
+  font-size: .78rem;
+  color: var(--primary);
+  font-family: var(--font-head);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: var(--transition);
+}
+.audit-read-more:hover { color: var(--primary-dark); text-decoration: underline; }
+.audit-modal-body {
+  font-size: .92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+/* ── Audit Review Grid ── */
+.audit-review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.audit-detail-col { display: flex; flex-direction: column; gap: 16px; }
+.audit-form-col   { position: sticky; top: 90px; }
+
+/* Full reason text block */
+.audit-full-reason {
+  font-size: .9rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin: 0;
+  border: 1px solid var(--border);
+}
+
+/* Decision radio cards */
+.audit-decision-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.audit-decision-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  background: #fff;
+}
+.audit-decision-card:hover { border-color: var(--primary-light); }
+.audit-radio { display: none; }
+.audit-radio:checked ~ .adc-check {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.audit-radio:checked ~ .adc-check::after { display: block; }
+.audit-decision-card:has(#status_approved:checked) { border-color: #10B981; background: rgba(16,185,129,.03); }
+.audit-decision-card:has(#status_rejected:checked) { border-color: #EF4444; background: rgba(239,68,68,.03);  }
+.audit-decision-card:has(#status_pending:checked)  { border-color: #F59E0B; background: rgba(245,158,11,.03); }
+
+.adc-check {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  transition: var(--transition);
+}
+.adc-check::after {
+  content: '';
+  display: none;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.adc-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.adc-label {
+  font-family: var(--font-head);
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.adc-sub {
+  font-size: .78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Style Django's textarea for admin_response */
+#id_admin_response {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: .92rem;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: #FAFBFF;
+  resize: vertical;
+  min-height: 140px;
+  outline: none;
+  transition: var(--transition);
+  line-height: 1.6;
+}
+#id_admin_response:focus {
+  border-color: var(--primary-light);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(58,79,215,.1);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .audit-election-summary { flex-direction: column; }
+  .aes-divider            { display: none; }
+  .audit-form-actions     { flex-direction: column; }
+  .audit-form-actions .btn { width: 100%; justify-content: center; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .audit-review-grid { grid-template-columns: 1fr; }
+  .audit-form-col    { position: static; }
+}
+
+
