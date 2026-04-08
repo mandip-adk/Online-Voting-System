@@ -49,98 +49,117 @@ def logout_view(request):
     return redirect('login')
 
 def home(request):
+    if request.user.is_authenticated:
+        if request.user.role == 'admin':
+            return redirect('admin_dashboard')
+        elif request.user.role == 'candidate':
+            return redirect('candidate_dashboard')
+        else:
+            return redirect('voter_dashboard')
     return render(request, 'home.html')
 
 
 @login_required
 def voter_dashboard(request):
-    if request.user.role == 'voter':
-        active_elections = Election.objects.all()
-        election_with_status= []
-        voted_count = pending_count = complete_count = 0
-    
-        for election in active_elections:
-
-            has_voted = VoterParticipation.objects.filter(
-                user =request.user,
-                election =election
-                ).exists()
-            election_with_status.append({'election': election,
-                                        'has_voted': has_voted})
-            
-            if has_voted:
-                voted_count += 1
-            if election.status == 'active' and not has_voted:
-                pending_count += 1
-            if election.status == 'closed' and not has_voted:
-                complete_count += 1
-
-        return render(request, 'voting/dashboard/voter_dashboard.html', {
-            'election_with_status': election_with_status,
-            'voted_count': voted_count,
-            'pending_count': pending_count,
-            'completed_count': complete_count
-            })
-    else:
+    if request.user.role != 'voter':
         return redirect('home')
-    
+
+    elections = Election.objects.all()
+
+    # sync status for all elections
+    for election in elections:
+        election.sync_status()
+
+    election_with_status = []
+    voted_count = pending_count = completed_count = 0
+
+    for election in elections:
+        has_voted = VoterParticipation.objects.filter(
+            user=request.user,
+            election=election
+        ).exists()
+
+        election_with_status.append({
+            'election': election,
+            'has_voted': has_voted,
+        })
+
+        if has_voted:
+            voted_count += 1
+        if election.status == 'active' and not has_voted:
+            pending_count += 1
+        if election.status == 'closed' and has_voted:
+            completed_count += 1
+
+    return render(request, 'voting/dashboard/voter_dashboard.html', {
+        'election_with_status': election_with_status,
+        'voted_count':          voted_count,
+        'pending_count':        pending_count,
+        'completed_count':      completed_count,
+    })
+
+
 @login_required
 def candidate_dashboard(request):
     if request.user.role != 'candidate':
         return redirect('home')
-    
-    else:
 
-        elections = Election.objects.filter(candidates__user =request.user )
-        election_with_votes = []
-        total_votes = 0
-        for election in elections:
-            candidate = Candidate.objects.get(user = request.user, election= election)
+    elections = Election.objects.filter(candidates__user=request.user)
 
-            votes_received = Votes.objects.filter(candidate=candidate).count()
-            total_votes+= votes_received
+    # sync status for all elections
+    for election in elections:
+        election.sync_status()
 
-            election_with_votes.append({
-                'election':election,
-                'votes_received': votes_received
-            })
-        return render(request, 'voting/dashboard/candidate_dashboard.html', {
-            'election_with_votes': election_with_votes,
-            'total_elections': elections.count(),
-            'active_elections': elections.filter(status='active').count(),
-            'closed_elections': elections.filter(status='closed').count(),
-            'total_votes': total_votes,
+    election_with_votes = []
+    total_votes = 0
+
+    for election in elections:
+        candidate = Candidate.objects.get(user=request.user, election=election)
+        votes_received = Votes.objects.filter(candidate=candidate).count()
+        total_votes += votes_received
+
+        election_with_votes.append({
+            'election':       election,
+            'votes_received': votes_received,
         })
 
-        
+    # re-fetch counts after sync so they reflect updated statuses
+    return render(request, 'voting/dashboard/candidate_dashboard.html', {
+        'election_with_votes': election_with_votes,
+        'total_elections':     elections.count(),
+        'active_elections':    elections.filter(status='active').count(),
+        'closed_elections':    elections.filter(status='closed').count(),
+        'total_votes':         total_votes,
+    })
+
+
 @login_required
 def admin_dashboard(request):
     if request.user.role != 'admin':
-        return redirect ('home')
-    else:
-        total_user = CustomUser.objects.count()
-        total_election = Election.objects.count()
-        total_voters = CustomUser.objects.filter(role= 'voter').count()
-        total_candidates = CustomUser.objects.filter(role='candidate').count()
-        total_vote_cast = Votes.objects.count()
-        elections = Election.objects.all()
-        election_with_vote_count= []
+        return redirect('home')
 
-        for election in elections:
-            vote_count = Votes.objects.filter(election=election).count()
-            election_with_vote_count.append({
-                'election':election,
-                'vote_count': vote_count
-            })
-        
-        return render(request, 'voting/dashboard/admin_dashboard.html',{
-            'total_user':total_user,
-            'total_election':total_election,
-            'total_voters':total_voters,
-            'total_candidates': total_candidates,
-            'total_vote_cast': total_vote_cast,
-            'election_with_vote_count': election_with_vote_count,
+    elections = Election.objects.all()
+
+    # sync status for all elections
+    for election in elections:
+        election.sync_status()
+
+    election_with_vote_count = []
+    for election in elections:
+        vote_count = Votes.objects.filter(election=election).count()
+        election_with_vote_count.append({
+            'election':   election,
+            'vote_count': vote_count,
         })
+
+    return render(request, 'voting/dashboard/admin_dashboard.html', {
+        'total_user':              CustomUser.objects.count(),
+        'total_election':          Election.objects.count(),
+        'total_voters':            CustomUser.objects.filter(role='voter').count(),
+        'total_candidates':        CustomUser.objects.filter(role='candidate').count(),
+        'total_vote_cast':         Votes.objects.count(),
+        'election_with_vote_count': election_with_vote_count,
+    })
 
 
 

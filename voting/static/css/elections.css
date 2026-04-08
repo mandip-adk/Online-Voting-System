@@ -923,6 +923,34 @@
 .ai-label { font-size: .83rem; color: var(--text-primary); font-weight: 500; }
 .ai-time { font-size: .75rem; color: var(--text-muted); margin-top: 1px; }
 
+/* ── Zero votes empty state ── */
+.result-zero-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 40px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-top: 16px;
+}
+.rzs-icon  { font-size: 3.5rem; margin-bottom: 16px; }
+.rzs-title {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.rzs-sub {
+  font-size: .95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 420px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .detail-content-grid { grid-template-columns: 1fr; }
