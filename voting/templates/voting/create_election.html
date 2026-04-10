@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-wrapper">
+  <h1>Create New Election</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn-primary">Create Election</button>
+    <a href="{% url 'organizer_dashboard' %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

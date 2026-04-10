@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/elections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <!-- WELCOME HEADER -->
+  <div class="dashboard-header">
+    <div class="dash-welcome">
+      <div class="dash-avatar">
+        {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+      </div>
+      <div>
+        <p class="dash-greeting">Welcome back,</p>
+        <h1 class="dash-name">{{ user.get_full_name|default:user.username }} 👋</h1>
+      </div>
+    </div>
+    <a href="{% url 'voting:create_election' %}" class="btn btn-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      + Create Election
+    </a>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="dash-stats-row">
+
+    <div class="dash-stat-card">
+      <div class="dsc-icon" style="background:rgba(58,79,215,.1);color:var(--primary)">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dsc-num">{{ total_elections }}</div>
+        <div class="dsc-label">Total Elections</div>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dsc-icon" style="background:rgba(16,185,129,.1);color:#059669">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dsc-num">{{ active_elections }}</div>
+        <div class="dsc-label">Active</div>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dsc-icon" style="background:rgba(245,158,11,.1);color:#D97706">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dsc-num">{{ pending_elections }}</div>
+        <div class="dsc-label">Pending</div>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dsc-icon" style="background:rgba(239,68,68,.1);color:#DC2626">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dsc-num">{{ closed_elections }}</div>
+        <div class="dsc-label">Closed</div>
+      </div>
+    </div>
+
+    <div class="dash-stat-card">
+      <div class="dsc-icon" style="background:rgba(139,92,246,.1);color:#7C3AED">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dsc-num">{{ total_vote_cast }}</div>
+        <div class="dsc-label">Total Votes Cast</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PENDING APPLICATIONS ALERT -->
+  {% if pending_applications_count %}
+  <div class="dash-alert">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+    </svg>
+    <p>
+      You have <strong>{{ pending_applications_count }} candidate application{{ pending_applications_count|pluralize }}</strong>
+      waiting for your review.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- CANDIDATE APPLICATIONS SECTION -->
+  <div class="dash-section-header" style="margin-top:2rem;">
+    <h2 class="dash-section-title">
+      🧑‍💼 Candidate Applications
+      {% if pending_applications_count %}
+        <span class="ec-status-badge badge-pending" style="font-size:.75rem;padding:2px 10px;margin-left:8px;">
+          {{ pending_applications_count }} Pending
+        </span>
+      {% endif %}
+    </h2>
+  </div>
+
+  <div class="dash-elections-list">
+    {% for application in pending_applications %}
+    <div class="dash-election-row">
+
+      <div class="der-left">
+        <div class="der-status-dot">
+          <span class="status-dot dot-pending"></span>
+        </div>
+        <div class="der-info">
+          <h3 class="der-title">
+            {{ application.user.get_full_name|default:application.user.username }}
+          </h3>
+          <div class="der-meta">
+            <span>Applied for: <strong>{{ application.election.title }}</strong></span>
+            <span class="der-meta-sep">·</span>
+            <span>ID: {{ application.user.voter_id }}</span>
+            {% if application.bio %}
+            <span class="der-meta-sep">·</span>
+            <span>{{ application.bio|truncatechars:60 }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="der-right">
+        <!-- Approve button -->
+        <form method="POST" action="{% url 'voting:approve_candidate' application.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-sm">
+            ✓ Approve
+          </button>
+        </form>
+        <!-- Reject button -->
+        <form method="POST" action="{% url 'voting:reject_candidate' application.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline btn-sm" style="color:#DC2626;border-color:#DC2626;">
+            ✗ Reject
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    {% empty %}
+    <div class="empty-state">
+      <h3 class="empty-title">No pending applications</h3>
+      <p class="empty-sub">All candidate applications have been reviewed.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ELECTIONS TABLE -->
+  <div class="dash-section-header" style="margin-top:2rem;">
+    <h2 class="dash-section-title">🗳️ Your Elections</h2>
+  </div>
+
+  <div class="dash-elections-list">
+    {% for item in election_with_vote_count %}
+    <div class="dash-election-row
+      {% if item.election.status == 'closed' %}der-closed{% endif %}
+      {% if item.election.status == 'active' %}der-urgent{% endif %}">
+
+      <div class="der-left">
+        <div class="der-status-dot">
+          <span class="status-dot dot-{{ item.election.status }}"></span>
+        </div>
+        <div class="der-info">
+          <h3 class="der-title">{{ item.election.title }}</h3>
+          <div class="der-meta">
+            <span>{{ item.election.start_date|date:"M d" }} → {{ item.election.end_date|date:"M d, Y" }}</span>
+            <span class="der-meta-sep">·</span>
+            <span>{{ item.election.candidates.count }} candidate{{ item.election.candidates.count|pluralize }}</span>
+            <span class="der-meta-sep">·</span>
+            <span class="ec-status-badge badge-{{ item.election.status }}" style="padding:2px 10px;font-size:.72rem;">
+              {{ item.election.get_status_display }}
+            </span>
+            <span class="der-meta-sep">·</span>
+            <span>{{ item.vote_count }} vote{{ item.vote_count|pluralize }} cast</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="der-right">
+        <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">View</a>
+        <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">Results →</a>
+      </div>
+
+    </div>
+
+    {% empty %}
+    <div class="empty-state">
+      <h3 class="empty-title">No elections yet</h3>
+      <p class="empty-sub">Create your first election to get started.</p>
+      <a href="{% url 'voting:create_election' %}" class="btn btn-primary" style="margin-top:1rem;">
+        + Create Election
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+</main>
+{% endblock %}

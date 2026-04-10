@@ -20,7 +20,7 @@
         <h1 class="dash-name">{{ user.get_full_name|default:user.username }} 👋</h1>
       </div>
     </div>
-    <a href="#" class="btn btn-primary">
+    <a href="{% url 'voting:elections' %}" class="btn btn-primary">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
       </svg>
@@ -38,7 +38,6 @@
         </svg>
       </div>
       <div>
-        <!-- total elections visible to this voter -->
         <div class="dsc-num">{{ election_with_status|length }}</div>
         <div class="dsc-label">Total Elections</div>
       </div>
@@ -51,7 +50,6 @@
         </svg>
       </div>
       <div>
-        <!-- pass voted_count from view: sum of items where has_voted == True -->
         <div class="dsc-num">{{ voted_count }}</div>
         <div class="dsc-label">Votes Cast</div>
       </div>
@@ -64,7 +62,6 @@
         </svg>
       </div>
       <div>
-        <!-- pass pending_count: active elections where has_voted == False -->
         <div class="dsc-num">{{ pending_count }}</div>
         <div class="dsc-label">Pending Votes</div>
       </div>
@@ -77,7 +74,6 @@
         </svg>
       </div>
       <div>
-        <!-- closed elections where user participated -->
         <div class="dsc-num">{{ completed_count }}</div>
         <div class="dsc-label">Completed</div>
       </div>
@@ -85,7 +81,7 @@
 
   </div>
 
-  <!-- PENDING VOTES ALERT (only if there are active elections the user hasn't voted in) -->
+  <!-- PENDING VOTES ALERT -->
   {% if pending_count %}
     <div class="dash-alert">
       <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -104,13 +100,12 @@
   </div>
 
   <div class="dash-elections-list">
-
     {% for item in election_with_status %}
       <div class="dash-election-row
         {% if item.election.status == 'closed' %}der-closed{% endif %}
         {% if item.election.status == 'active' and not item.has_voted %}der-urgent{% endif %}">
 
-        <!-- LEFT: STATUS DOT + INFO -->
+        <!-- LEFT -->
         <div class="der-left">
           <div class="der-status-dot">
             <span class="status-dot dot-{{ item.election.status }}"></span>
@@ -129,49 +124,41 @@
           </div>
         </div>
 
-        <!-- RIGHT: VOTED BADGE OR ACTION BUTTONS -->
+        <!-- RIGHT -->
         <div class="der-right">
 
           {% if item.has_voted %}
-            <!-- Already voted -->
             <div class="der-voted-badge">
               <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               Voted
             </div>
-            <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">
-              Results →
-            </a>
+            <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">Results →</a>
 
           {% elif item.election.status == 'active' %}
-            <!-- Active, not yet voted -->
-            <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">
-              View
-            </a>
-            <a href="{% url 'voting:vote' item.election.pk %}" class="btn btn-primary btn-sm">
-              Vote Now →
-            </a>
+            <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">View</a>
+            <a href="{% url 'voting:vote' item.election.pk %}" class="btn btn-primary btn-sm">Vote Now →</a>
 
           {% elif item.election.status == 'pending' %}
-            <!-- Not open yet -->
             <span class="der-opens-on">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               Opens {{ item.election.start_date|date:"M d, Y" }}
             </span>
-            <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">
-              Preview
-            </a>
+            <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">Preview</a>
+            {% if not item.has_applied %}
+              <a href="{% url 'voting:apply_candidate' item.election.pk %}" class="btn btn-primary btn-sm">
+                Apply as Candidate
+              </a>
+            {% else %}
+              <span class="der-voted-badge">Applied ✓</span>
+            {% endif %}
 
           {% else %}
-            <!-- Closed, user did not vote -->
             <span class="der-missed">Did not vote</span>
-            <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">
-              Results →
-            </a>
-
+            <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">Results →</a>
           {% endif %}
 
         </div>
@@ -188,8 +175,58 @@
         <p class="empty-sub">You have not been assigned to any elections.</p>
       </div>
     {% endfor %}
-
   </div>
+
+  <!-- ── MY CANDIDACIES SECTION ── -->
+  {% if is_candidate %}
+  <div class="dash-section-header" style="margin-top:2rem;">
+    <h2 class="dash-section-title">🏆 My Candidacies</h2>
+  </div>
+
+  <div class="dash-elections-list">
+    {% for item in my_candidacies %}
+    <div class="dash-election-row">
+
+      <div class="der-left">
+        <div class="der-status-dot">
+          <span class="status-dot dot-{{ item.election.status }}"></span>
+        </div>
+        <div class="der-info">
+          <h3 class="der-title">{{ item.election.title }}</h3>
+          <div class="der-meta">
+            <span>{{ item.election.start_date|date:"M d" }} → {{ item.election.end_date|date:"M d, Y" }}</span>
+            <span class="der-meta-sep">·</span>
+            {% if item.status == 'approved' %}
+              <span class="ec-status-badge badge-active" style="padding:2px 10px;font-size:.72rem;">Approved ✓</span>
+            {% elif item.status == 'pending' %}
+              <span class="ec-status-badge badge-pending" style="padding:2px 10px;font-size:.72rem;">Pending Review</span>
+            {% else %}
+              <span class="ec-status-badge badge-closed" style="padding:2px 10px;font-size:.72rem;">Rejected</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="der-right">
+        {% if item.status == 'approved' %}
+          <div class="der-voted-badge">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ item.votes_received }} vote{{ item.votes_received|pluralize }} received
+          </div>
+          <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">Results →</a>
+        {% elif item.status == 'pending' %}
+          <span class="der-opens-on">Awaiting organizer approval</span>
+        {% else %}
+          <span class="der-missed">Application rejected</span>
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
 </main>
 {% endblock %}
