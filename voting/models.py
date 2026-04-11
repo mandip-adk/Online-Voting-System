@@ -9,14 +9,33 @@ class Election(models.Model):
         ('active',  'Active'),
         ('closed',  'Closed'),
     ]
-    title      = models.CharField(max_length=50)
-    start_date = models.DateTimeField()
-    end_date   = models.DateTimeField()
-    status     = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    created_by = models.ForeignKey(
+    ELIGIBILITY_CHOICES = [
+        ('open',   'Open — Anyone registered can vote'),
+        ('domain', 'Domain — Only specific email domain'),
+        ('id_list','ID List — Only specific voter IDs'),
+    ]
+
+    title             = models.CharField(max_length=50)
+    start_date        = models.DateTimeField()
+    end_date          = models.DateTimeField()
+    status            = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_by        = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="elections"
+    )
+    eligibility_type  = models.CharField(
+        max_length=10,
+        choices=ELIGIBILITY_CHOICES,
+        default='open'
+    )
+    # For domain: store "school.edu"
+    # For id_list: store comma-separated IDs "ID001,ID002,ID003"
+    # For open: leave blank
+    eligibility_value = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Domain: e.g. school.edu | ID List: e.g. ID001,ID002,ID003"
     )
 
     def __str__(self):
@@ -33,6 +52,27 @@ class Election(models.Model):
         if self.status != new_status:
             self.status = new_status
             self.save(update_fields=['status'])
+
+    def is_eligible(self, user):
+        """Check if a user is eligible to vote in this election."""
+        if self.eligibility_type == 'open':
+            return True
+
+        elif self.eligibility_type == 'domain':
+            # Check if user email ends with the specified domain
+            domain = (self.eligibility_value or '').strip()
+            return user.email.endswith(f'@{domain}')
+
+        elif self.eligibility_type == 'id_list':
+            # Check if user voter_id is in the comma-separated list
+            id_list = [
+                vid.strip()
+                for vid in (self.eligibility_value or '').split(',')
+                if vid.strip()
+            ]
+            return user.voter_id in id_list
+
+        return False
 
 
 class Candidate(models.Model):
@@ -56,11 +96,11 @@ class Candidate(models.Model):
     status    = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
-        default='pending'        # ← every application starts as pending
+        default='pending'
     )
 
     class Meta:
-        unique_together = [('user', 'election')]  # ← can't apply twice
+        unique_together = [('user', 'election')]
 
     def __str__(self):
         return f"{self.user.username} - {self.election.title} ({self.status})"
@@ -102,4 +142,5 @@ class Votes(models.Model):
 
     def __str__(self):
         return str(self.token)
+    
     
