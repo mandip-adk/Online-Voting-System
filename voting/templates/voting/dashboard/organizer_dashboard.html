@@ -201,8 +201,20 @@
       </div>
 
       <div class="der-right">
-        <a href="{% url 'voting:election_detail' item.election.pk %}" class="btn btn-outline btn-sm">View</a>
-        <a href="{% url 'voting:result' item.election.pk %}" class="btn btn-ghost btn-sm">Results →</a>
+        <a href="{% url 'voting:election_detail' item.election.pk %}"
+        class="btn btn-outline btn-sm">View</a>
+        <a href="{% url 'voting:result' item.election.pk %}"
+        class="btn btn-ghost btn-sm">Results →</a>
+        {% if item.election.status == 'pending' %}
+        <a href="{% url 'voting:edit_election' item.election.pk %}"
+        class="btn btn-outline btn-sm">✏️ Edit</a>
+        <a href="{% url 'voting:delete_election' item.election.pk %}"
+        class="btn btn-sm" style="color:#DC2626;border:1px solid #DC2626;border-radius:8px;padding:6px 12px;">
+       🗑️ Delete
+        </a>
+        {% endif %}
+        <a href="{% url 'audit:audit_list' %}"
+        class="btn btn-ghost btn-sm">Audits</a>
       </div>
 
     </div>

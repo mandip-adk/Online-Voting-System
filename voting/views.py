@@ -236,3 +236,63 @@ def reject_candidate(request, pk):
     messages.success(request, f"{candidate.user.get_full_name()} rejected.")
     return redirect('organizer_dashboard')
 
+@login_required
+def edit_election(request, pk):
+    if request.user.role != 'organizer':
+        messages.error(request, "Only organizers can edit elections.")
+        return redirect('home')
+
+    election = get_object_or_404(Election, pk=pk)
+
+    # Only the creator can edit
+    if election.created_by != request.user:
+        messages.error(request, "You can only edit your own elections.")
+        return redirect('organizer_dashboard')
+
+    # Can't edit active or closed elections
+    if election.status != 'pending':
+        messages.error(request, "You can only edit pending elections.")
+        return redirect('organizer_dashboard')
+
+    if request.method == 'POST':
+        form = ElectionForm(request.POST, instance=election)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Election '{election.title}' updated successfully.")
+            return redirect('organizer_dashboard')
+    else:
+        form = ElectionForm(instance=election)
+
+    return render(request, 'voting/edit_election.html', {
+        'form':     form,
+        'election': election,
+    })
+
+
+@login_required
+def delete_election(request, pk):
+    if request.user.role != 'organizer':
+        messages.error(request, "Only organizers can delete elections.")
+        return redirect('home')
+
+    election = get_object_or_404(Election, pk=pk)
+
+    # Only the creator can delete
+    if election.created_by != request.user:
+        messages.error(request, "You can only delete your own elections.")
+        return redirect('organizer_dashboard')
+
+    # Can't delete active or closed elections
+    if election.status != 'pending':
+        messages.error(request, "You can only delete pending elections.")
+        return redirect('organizer_dashboard')
+
+    if request.method == 'POST':
+        title = election.title
+        election.delete()
+        messages.success(request, f"Election '{title}' deleted successfully.")
+        return redirect('organizer_dashboard')
+
+    return render(request, 'voting/delete_election.html', {
+        'election': election,
+    })
