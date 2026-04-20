@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from voting.models import Election, VoterParticipation, Candidate, Votes
 from .models import CustomUser
 from django.db.models import Count
+from audit.models import AuditRequest
 
 
 def register(request):
@@ -70,15 +71,15 @@ def voter_dashboard(request):
     voted_count = pending_count = completed_count = 0
 
     for election in elections:
-        has_applied = Candidate.objects.filter(
-        user=request.user, election=election
-        ).exists()
         has_voted = VoterParticipation.objects.filter(
             user=request.user, election=election
         ).exists()
+        has_applied = Candidate.objects.filter(
+            user=request.user, election=election
+        ).exists()
         election_with_status.append({
-            'election':  election,
-            'has_voted': has_voted,
+            'election':    election,
+            'has_voted':   has_voted,
             'has_applied': has_applied,
         })
         if has_voted:
@@ -88,11 +89,34 @@ def voter_dashboard(request):
         if election.status == 'closed' and has_voted:
             completed_count += 1
 
+    my_candidacies = Candidate.objects.filter(
+        user=request.user
+    ).select_related('election')
+
+    candidacy_data = []
+    for candidacy in my_candidacies:
+        votes_received = Votes.objects.filter(candidate=candidacy).count()
+
+        audit = AuditRequest.objects.filter(
+            candidate=candidacy,
+            election=candidacy.election
+        ).first()
+
+        candidacy_data.append({
+            'election':       candidacy.election,
+            'status':         candidacy.status,
+            'votes_received': votes_received,
+            'has_audit':      audit is not None,
+            'audit_pk':       audit.pk if audit else None,
+        })
+
     return render(request, 'voting/dashboard/voter_dashboard.html', {
         'election_with_status': election_with_status,
         'voted_count':          voted_count,
         'pending_count':        pending_count,
         'completed_count':      completed_count,
+        'my_candidacies':       candidacy_data,        # ← new
+        'is_candidate':         my_candidacies.exists(), # ← new
     })
 
 

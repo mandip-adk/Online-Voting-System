@@ -13,9 +13,9 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Audit Requests</h1>
-      <p class="page-subtitle">Review and manage candidate audit requests across all elections.</p>
+      <p class="page-subtitle">Review and manage candidate audit requests for your elections.</p>
     </div>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">
+    <a href="{% url 'organizer_dashboard' %}" class="btn btn-outline">
       ← Back to Dashboard
     </a>
   </div>
@@ -45,11 +45,7 @@
         </svg>
       </div>
       <div>
-        <div class="dsc-num">
-          {{ audit_requests|dictsort:"status"|length }}
-          <!-- pass pending_count from view for accuracy -->
-          {{ pending_count }}
-        </div>
+        <div class="dsc-num">{{ pending_count }}</div>
         <div class="dsc-label">Pending</div>
       </div>
     </div>
@@ -62,7 +58,6 @@
         </svg>
       </div>
       <div>
-        <!-- pass approved_count from view -->
         <div class="dsc-num">{{ approved_count }}</div>
         <div class="dsc-label">Approved</div>
       </div>
@@ -76,7 +71,6 @@
         </svg>
       </div>
       <div>
-        <!-- pass rejected_count from view -->
         <div class="dsc-num">{{ rejected_count }}</div>
         <div class="dsc-label">Rejected</div>
       </div>
@@ -94,7 +88,7 @@
           <th>Election</th>
           <th>Reason</th>
           <th>Status</th>
-          <th>Admin Response</th>
+          <th>Response</th>
           <th>Submitted</th>
           <th>Actions</th>
         </tr>
@@ -104,7 +98,6 @@
         {% for audit in audit_requests %}
           <tr>
 
-            <!-- Row number -->
             <td>
               <span style="font-size:.85rem;color:var(--text-muted);font-weight:600;">
                 {{ forloop.counter }}
@@ -114,8 +107,7 @@
             <!-- Candidate -->
             <td>
               <div style="display:flex;align-items:center;gap:10px;">
-                <div class="rr-avatar"
-                     style="width:36px;height:36px;font-size:.75rem;flex-shrink:0;">
+                <div class="rr-avatar" style="width:36px;height:36px;font-size:.75rem;flex-shrink:0;">
                   {{ audit.candidate.user.first_name|slice:":1" }}{{ audit.candidate.user.last_name|slice:":1" }}
                 </div>
                 <div>
@@ -141,41 +133,34 @@
 
             <!-- Reason -->
             <td style="max-width:220px;">
-              <p class="audit-reason-text">
-                {{ audit.reason|truncatechars:80 }}
-              </p>
+              <p class="audit-reason-text">{{ audit.reason|truncatechars:80 }}</p>
               {% if audit.reason|length > 80 %}
                 <button class="audit-read-more"
-                        onclick="openReasonModal('{{ audit.reason|escapejs }}', '{{ audit.admin_response|escapejs|default:'' }}')"
-                >
+                        onclick="openReasonModal('{{ audit.reason|escapejs }}', '{{ audit.admin_response|escapejs|default:'' }}')">
                   Read more
                 </button>
               {% endif %}
             </td>
 
-            <!-- Audit Status -->
+            <!-- Status -->
             <td>
               {% if audit.status == 'pending' %}
                 <span class="audit-status-badge audit-pending">
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                   Pending
                 </span>
               {% elif audit.status == 'approved' %}
                 <span class="audit-status-badge audit-approved">
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor" stroke-width="2.5">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                   </svg>
                   Approved
                 </span>
               {% elif audit.status == 'rejected' %}
                 <span class="audit-status-badge audit-rejected">
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor" stroke-width="2.5">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
                   Rejected
@@ -183,16 +168,13 @@
               {% endif %}
             </td>
 
-            <!-- Admin Response -->
+            <!-- Response -->
             <td style="max-width:200px;">
               {% if audit.admin_response %}
-                <p class="audit-reason-text">
-                  {{ audit.admin_response|truncatechars:60 }}
-                </p>
+                <p class="audit-reason-text">{{ audit.admin_response|truncatechars:60 }}</p>
                 {% if audit.admin_response|length > 60 %}
                   <button class="audit-read-more"
-                          onclick="openReasonModal('{{ audit.reason|escapejs }}', '{{ audit.admin_response|escapejs }}')"
-                  >
+                          onclick="openReasonModal('{{ audit.reason|escapejs }}', '{{ audit.admin_response|escapejs }}')">
                     Read more
                   </button>
                 {% endif %}
@@ -203,7 +185,7 @@
               {% endif %}
             </td>
 
-            <!-- Created at -->
+            <!-- Submitted -->
             <td>
               <div class="at-date">{{ audit.created_at|date:"M d, Y" }}</div>
               <div class="at-sub">{{ audit.created_at|timesince }} ago</div>
@@ -212,6 +194,17 @@
             <!-- Actions -->
             <td>
               <div class="at-actions">
+                {% if audit.status == 'pending' %}
+                <a href="{% url 'audit:audit_review' audit.pk %}"
+                   class="btn btn-primary btn-sm">
+                  Review →
+                </a>
+                {% else %}
+                <a href="{% url 'audit:audit_review' audit.pk %}"
+                   class="btn btn-ghost btn-sm">
+                  View
+                </a>
+                {% endif %}
                 <a href="{% url 'voting:election_detail' audit.election.pk %}"
                    class="btn btn-ghost btn-sm">
                   Election
@@ -245,31 +238,27 @@
     </table>
   </div>
 
-  <!-- REASON + RESPONSE MODAL -->
+  <!-- MODAL -->
   <div class="modal-overlay" id="reasonModal">
     <div class="modal-box">
       <div class="modal-icon" style="background:rgba(245,158,11,.1);color:#D97706;">
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293
                l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
       </div>
       <h2 class="modal-title">Audit Request Detail</h2>
-
       <div style="text-align:left;width:100%;">
         <p class="form-label" style="margin-bottom:6px;">Reason</p>
         <p class="audit-modal-body" id="reasonModalBody"></p>
-
         <div id="responseSection" style="display:none;margin-top:16px;">
-          <p class="form-label" style="margin-bottom:6px;">Admin Response</p>
+          <p class="form-label" style="margin-bottom:6px;">Response</p>
           <p class="audit-modal-body" id="responseModalBody"
              style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);
                     border-radius:var(--radius-md);padding:12px 16px;"></p>
         </div>
       </div>
-
       <div class="modal-actions" style="justify-content:center;margin-top:20px;">
         <button class="btn btn-primary" onclick="closeReasonModal()">Close</button>
       </div>
@@ -291,14 +280,13 @@
     }
     document.getElementById('reasonModal').classList.add('active');
   }
-
   function closeReasonModal() {
     document.getElementById('reasonModal').classList.remove('active');
   }
-
-  document.getElementById('reasonModal').addEventListener('click', function (e) {
+  document.getElementById('reasonModal').addEventListener('click', function(e) {
     if (e.target === this) closeReasonModal();
   });
 </script>
 
 {% endblock %}
+

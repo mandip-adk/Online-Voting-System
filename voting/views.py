@@ -27,14 +27,29 @@ def election_list(request):
 def election_details(request, pk):
     election = get_object_or_404(Election, pk=pk)
     election.sync_status()
-    candidates = Candidate.objects.filter(election=election)
+
+    # Only show approved candidates
+    candidates = Candidate.objects.filter(election=election, status='approved')
+
     has_voted = VoterParticipation.objects.filter(
         user=request.user, election=election
     ).exists()
-    return render(request, "voting/election_detail.html", {
-        'election':   election,
-        'candidates': candidates,
-        'has_voted':  has_voted,
+
+    # Turnout calculation
+    total_registered = VoterParticipation.objects.filter(election=election).count()
+    participated     = election.participations.count()
+    turnout_pct      = round(participated / total_registered * 100) \
+                       if total_registered > 0 else 0
+
+    # Check eligibility
+    is_eligible = election.is_eligible(request.user)
+
+    return render(request, "voting/election_details.html", {
+        'election':    election,
+        'candidates':  candidates,
+        'has_voted':   has_voted,
+        'turnout_pct': turnout_pct,
+        'is_eligible': is_eligible,
     })
 
 

@@ -13,10 +13,9 @@
       <h1 class="page-title">Elections</h1>
       <p class="page-subtitle">Browse and participate in ongoing and upcoming elections.</p>
     </div>
-    {% if user.is_staff %}
-      <a href="#" class="btn btn-primary">+ New Election</a>
-    {% endif %}
-  </div>
+    {% if user.role == 'organizer' %}
+  <a href="{% url 'voting:create_election' %}" class="btn btn-primary">+ New Election</a>
+{% endif %}
 
   <!-- FILTER TABS -->
   <div class="filter-tabs">

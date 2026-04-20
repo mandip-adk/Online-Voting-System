@@ -11,7 +11,7 @@
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb">
-    <a href="{% url 'candidate_dashboard' %}" class="bc-link">Dashboard</a>
+    <a href="{% url 'voter_dashboard' %}" class="bc-link">Dashboard</a>
     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
@@ -41,30 +41,11 @@
         Submitted {{ audit_request.created_at|date:"M d, Y" }}
         &nbsp;·&nbsp;
         {% if audit_request.status == 'pending' %}
-          <span class="audit-status-badge audit-pending" style="font-size:.72rem;">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Pending
-          </span>
+          <span class="audit-status-badge audit-pending" style="font-size:.72rem;">Pending</span>
         {% elif audit_request.status == 'approved' %}
-          <span class="audit-status-badge audit-approved" style="font-size:.72rem;">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-            Approved
-          </span>
+          <span class="audit-status-badge audit-approved" style="font-size:.72rem;">Approved</span>
         {% elif audit_request.status == 'rejected' %}
-          <span class="audit-status-badge audit-rejected" style="font-size:.72rem;">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            Rejected
-          </span>
+          <span class="audit-status-badge audit-rejected" style="font-size:.72rem;">Rejected</span>
         {% endif %}
       </p>
     </div>
@@ -73,40 +54,35 @@
   <!-- STATUS BANNER -->
   {% if audit_request.status == 'pending' %}
     <div class="voter-banner banner-pending">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="2.5">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
       <div>
         <strong>Your audit request is under review.</strong>
-        The admin has not responded yet. Check back later.
+        The organizer has not responded yet. Check back later.
       </div>
     </div>
-
   {% elif audit_request.status == 'approved' %}
     <div class="voter-banner banner-voted">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="2.5">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
       <div>
         <strong>Your audit request has been approved.</strong>
-        The administrator has reviewed and approved your request.
+        The organizer has reviewed and approved your request.
       </div>
     </div>
-
   {% elif audit_request.status == 'rejected' %}
     <div class="voter-banner banner-closed">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="2.5">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
       <div>
         <strong>Your audit request has been rejected.</strong>
-        See the admin response below for more details.
+        See the organizer response below for more details.
       </div>
     </div>
   {% endif %}
@@ -114,10 +90,9 @@
   <!-- REPORT BODY -->
   <div class="audit-review-grid" style="margin-top:24px;">
 
-    <!-- LEFT COLUMN: REQUEST INFO -->
+    <!-- LEFT -->
     <div class="audit-detail-col">
 
-      <!-- Election Info -->
       <div class="sidebar-widget">
         <h3 class="sw-title">Election Details</h3>
         <div class="info-rows">
@@ -137,15 +112,11 @@
           </div>
           <div class="info-row">
             <span class="ir-label">Opens</span>
-            <span class="ir-value">
-              {{ audit_request.election.start_date|date:"M d, Y · g:i A" }}
-            </span>
+            <span class="ir-value">{{ audit_request.election.start_date|date:"M d, Y · g:i A" }}</span>
           </div>
           <div class="info-row">
             <span class="ir-label">Closes</span>
-            <span class="ir-value">
-              {{ audit_request.election.end_date|date:"M d, Y · g:i A" }}
-            </span>
+            <span class="ir-value">{{ audit_request.election.end_date|date:"M d, Y · g:i A" }}</span>
           </div>
           <div class="info-row">
             <span class="ir-label">Total Votes</span>
@@ -168,7 +139,6 @@
         </div>
       </div>
 
-      <!-- Audit Meta -->
       <div class="sidebar-widget">
         <h3 class="sw-title">Request Info</h3>
         <div class="info-rows">
@@ -201,14 +171,12 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: REASON + RESPONSE -->
+    <!-- RIGHT -->
     <div class="audit-form-col">
 
-      <!-- Your Submitted Reason -->
       <div class="audit-form-card">
         <div class="audit-form-header">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
           </svg>
@@ -219,29 +187,24 @@
         </p>
       </div>
 
-      <!-- Admin Response -->
       <div class="audit-form-card" style="margin-top:16px;">
         <div class="audit-form-header">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04
                  A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622
                  0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          Admin Response
+          Organizer Response
         </div>
 
         {% if audit_request.admin_response %}
           <p class="audit-full-reason"
              style="margin-top:16px;
                     {% if audit_request.status == 'approved' %}
-                      background:rgba(16,185,129,.05);
-                      border-color:rgba(16,185,129,.2);
-                      color:var(--text-primary);
+                      background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.2);
                     {% elif audit_request.status == 'rejected' %}
-                      background:rgba(239,68,68,.05);
-                      border-color:rgba(239,68,68,.2);
+                      background:rgba(239,68,68,.05);border-color:rgba(239,68,68,.2);
                     {% endif %}">
             {{ audit_request.admin_response }}
           </p>
@@ -249,32 +212,31 @@
           <div style="display:flex;flex-direction:column;align-items:center;
                       gap:10px;padding:32px 20px;text-align:center;">
             <svg width="36" height="36" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor" stroke-width="1.5"
-                 style="color:var(--text-muted);">
+                 stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <p style="color:var(--text-muted);font-size:.88rem;">
-              No response from admin yet.<br/>
+              No response from organizer yet.<br/>
               <span style="font-size:.8rem;">You will be notified once reviewed.</span>
             </p>
           </div>
         {% endif %}
 
-        <!-- Actions -->
         <div class="audit-form-actions">
-          <a href="{% url 'candidate_dashboard' %}" class="btn btn-outline">
+          <a href="{% url 'voter_dashboard' %}" class="btn btn-outline">
             ← Back to Dashboard
           </a>
-          <a href="{% url 'voting:result' audit_request.election.pk %}"
-             class="btn btn-primary">
+          <a href="{% url 'voting:result' audit_request.election.pk %}" class="btn btn-primary">
             View Results →
           </a>
         </div>
-      </div>
 
+      </div>
     </div>
+
   </div>
 
 </main>
 {% endblock %}
+
