@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Election, Candidate, VoterParticipation, Votes
-from .forms import ElectionForm
+from .forms import ElectionForm, CandidateApplicationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -192,13 +192,23 @@ def apply_candidate(request, pk):
         messages.error(request, "You have already applied for this election.")
         return redirect('voter_dashboard')
 
-    Candidate.objects.create(
-        user=request.user,
-        election=election,
-        status='pending'
-    )
-    messages.success(request, "Application submitted! Waiting for organizer approval.")
-    return redirect('voter_dashboard')
+    if request.method == 'POST':
+        form = CandidateApplicationForm(request.POST)
+        if form.is_valid():
+            candidate          = form.save(commit=False)
+            candidate.user     = request.user
+            candidate.election = election
+            candidate.status   = 'pending'
+            candidate.save()
+            messages.success(request, "Application submitted! Waiting for organizer approval.")
+            return redirect('voter_dashboard')
+    else:
+        form = CandidateApplicationForm()
+
+    return render(request, 'voting/apply_candidate.html', {
+        'form':     form,
+        'election': election,
+    })
 
 
 @login_required

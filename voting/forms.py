@@ -1,5 +1,5 @@
 from django import forms
-from .models import Election
+from .models import Election, Candidate
 
 class ElectionForm(forms.ModelForm):
     class Meta:
@@ -38,4 +38,20 @@ class ElectionForm(forms.ModelForm):
 
         return cleaned_data
     
-    
+class CandidateApplicationForm(forms.ModelForm):
+    class Meta:
+        model  = Candidate
+        fields = ['bio', 'photo_url']
+        widgets = {
+            'bio': forms.Textarea(attrs={
+                'rows':        5,
+                'placeholder': 'Tell voters who you are and why you are running...'
+            }),
+            'photo_url': forms.URLInput(attrs={
+                'placeholder': 'https://example.com/your-photo.jpg (optional)'
+            }),
+        }
+        labels = {
+            'bio':       'Your bio / campaign statement',
+            'photo_url': 'Profile photo URL (optional)',
+        }
