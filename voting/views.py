@@ -306,3 +306,54 @@ def delete_election(request, pk):
     return render(request, 'voting/delete_election.html', {
         'election': election,
     })
+
+
+import csv
+import io
+from .forms import CSVUploadForm
+
+@login_required
+def upload_eligible_voters(request, election_id):
+    election = get_object_or_404(Election, id=election_id, created_by=request.user)
+
+    # Only makes sense for id_list elections
+    if election.eligibility_type != 'id_list':
+        messages.error(request, "This election does not use ID list eligibility.")
+        return redirect('election_detail', election_id=election.id)
+
+    if request.method == 'POST':
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['csv_file']
+
+            # Read and decode
+            decoded = csv_file.read().decode('utf-8')
+            reader = csv.reader(io.StringIO(decoded))
+
+            new_ids = []
+            for row in reader:
+                if row:  # skip empty rows
+                    voter_id = row[0].strip()
+                    if voter_id:
+                        new_ids.append(voter_id)
+
+            if not new_ids:
+                messages.error(request, "No valid voter IDs found in the CSV.")
+                return render(request, 'voting/upload_voters.html', {'form': form, 'election': election})
+
+            # Merge with existing IDs
+            existing = [
+                vid.strip()
+                for vid in (election.eligibility_value or '').split(',')
+                if vid.strip()
+            ]
+            merged = list(set(existing + new_ids))  # remove duplicates
+            election.eligibility_value = ','.join(merged)
+            election.save()
+
+            messages.success(request, f"{len(new_ids)} voter IDs uploaded. Total: {len(merged)}.")
+            return redirect('election_detail', election_id=election.id)
+    else:
+        form = CSVUploadForm()
+
+    return render(request, 'voting/upload_voters.html', {'form': form, 'election': election})

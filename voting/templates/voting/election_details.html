@@ -342,6 +342,20 @@
           View Audit Requests →
         </a>
       </div>
+
+      <!-- CSV UPLOAD — only for id_list elections -->
+      {% if election.eligibility_type == 'id_list' %}
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Eligible Voters</h3>
+        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:14px;">
+          Upload a CSV of voter IDs to bulk-add eligible voters to this election.
+        </p>
+        <a href="{% url 'voting:upload_eligible_voters' election.id %}" class="btn btn-outline btn-full">
+          Upload Voter IDs (CSV) →
+        </a>
+      </div>
+      {% endif %}
+
       {% endif %}
 
     </aside>
@@ -349,4 +363,3 @@
 
 </main>
 {% endblock %}
-

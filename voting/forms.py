@@ -55,3 +55,9 @@ class CandidateApplicationForm(forms.ModelForm):
             'bio':       'Your bio / campaign statement',
             'photo_url': 'Profile photo URL (optional)',
         }
+
+class CSVUploadForm(forms.Form):
+    csv_file = forms.FileField(
+        label="Upload CSV file",
+        help_text="CSV must have one voter ID per row, no header needed."
+    )

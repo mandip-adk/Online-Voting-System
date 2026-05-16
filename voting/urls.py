@@ -3,7 +3,8 @@ from .views import (
     election_details, election_list, election_result,
     cast_vote, create_election, apply_candidate,
     approve_candidate, reject_candidate,
-    edit_election, delete_election
+    edit_election, delete_election,
+    upload_eligible_voters,
 )
 
 app_name = "voting"
@@ -19,6 +20,6 @@ urlpatterns = [
     path("election/<int:pk>/delete/", delete_election,   name="delete_election"),
     path("candidate/<int:pk>/approve/", approve_candidate, name="approve_candidate"),
     path("candidate/<int:pk>/reject/",  reject_candidate,  name="reject_candidate"),
-
+    path('election/<int:election_id>/upload-voters/', upload_eligible_voters, name='upload_eligible_voters'),
     
 ]
