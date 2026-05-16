@@ -1,254 +1,212 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iVOTE — Online Voting System</title>
-  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-</head>
-<body>
- 
-  <!-- ── Navbar ── -->
-  <nav class="navbar">
-    <a href="base.html" class="navbar-brand">
-      <div class="brand-logo"><span>i</span>V</div>
-      <span class="logo-text"><span class="i-part">i</span>VOTE</span>
-    </a>
-    <ul class="navbar-nav">
-      <li><a href="{% url 'home' %}"  class="nav-link active">Home</a></li>
-      <li><a href="#"     class="nav-link">About</a></li>
-      <li><a href="#"   class="nav-link">Contact Us</a></li>
-    </ul>
-    <div class="navbar-actions">
-      <a href="{% url 'login' %}"    class="btn btn-ghost btn-sm" style="color:#fff;background:rgba(255,255,255,.15);">Log In</a>
-      <a href="{% url 'register' %}" class="btn btn-primary btn-sm" style="background:#fff;color:var(--primary);">Register</a>
-    </div>
-  </nav>
- 
+
+{% block title %}iVOTE — Online Voting System{% endblock %}
+
+{% block content %}
+
   <!-- ── Hero Section ── -->
-  <section class="hero">
-    <div class="hero-bg-blob blob-1"></div>
-    <div class="hero-bg-blob blob-2"></div>
-    <div class="hero-bg-blob blob-3"></div>
- 
-    <div class="container hero-grid">
- 
-      <!-- Left: Text -->
-      <div class="hero-content">
-        <div class="hero-badge badge badge-primary">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Trusted by thousands of voters
-        </div>
- 
-        <h1 class="hero-title">
-          <span class="brand-inline"><em>i</em>VOTE</span>
+  <section class="home-hero">
+    <div class="hero-wave-top"></div>
+    <div class="container hero-inner">
+
+      <!-- Left -->
+      <div class="home-hero-content">
+        <h1 class="home-hero-title">
+          <span class="home-brand-pill"><em>i</em>VOTE</span>
           Online Voting System
         </h1>
- 
-        <p class="hero-desc">
-          Let's make voting and elections easy for you. This is designed to ensure
-          a secured, transparent, and accessible voting session for everyone.
+        <p class="home-hero-desc">
+          Let's make voting and elections easy for you. This is
+          designed to ensure a secured, transparent, and accessible
+          voting session for everyone.
         </p>
- 
-        <div class="hero-actions">
-          <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
-            Register as a Voter
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-          <a href="{% url 'login' %}" class="btn btn-outline btn-lg">Already registered?</a>
-        </div>
- 
-        <!-- Stats row -->
-        <div class="hero-stats">
-          <div class="stat-item">
-            <span class="stat-num">10k+</span>
-            <span class="stat-label">Registered Voters</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-num">99.9%</span>
-            <span class="stat-label">Uptime</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-num">256-bit</span>
-            <span class="stat-label">Encryption</span>
-          </div>
-        </div>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg home-hero-btn">
+          Register as a Voter
+        </a>
       </div>
- 
-      <!-- Right: Dashboard Preview Card -->
-      <div class="hero-visual">
-        <div class="preview-card">
-          <div class="preview-header">
-            <div class="preview-dots">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
-            </div>
-            <span class="preview-url">ivote.app/dashboard</span>
-          </div>
-          <div class="preview-body">
-            <!-- Mini sidebar -->
-            <div class="mini-sidebar">
-              <div class="mini-avatar">JD</div>
-              <div class="mini-name">Juan Dela Cruz</div>
-              <nav class="mini-nav">
-                <a class="mini-nav-item active">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-                  Dashboard
-                </a>
-                <a class="mini-nav-item">
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                  Vote
-                </a>
-                <a class="mini-nav-item">
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                  Guidelines
-                </a>
-                <a class="mini-nav-item">
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Settings
-                </a>
-              </nav>
-            </div>
-            <!-- Mini content -->
-            <div class="mini-content">
-              <div class="mini-greeting">Hello, <strong>Juan!</strong></div>
-              <div class="mini-sub">Welcome to iVOTE's Voting System</div>
-              <div class="mini-election-card">
-                <div class="mini-election-label">Ongoing Election</div>
-                <div class="mini-election-title">President Student Council</div>
-                <button class="mini-vote-btn">Vote Now →</button>
-              </div>
-              <!-- Mini bar chart -->
-              <div class="mini-chart-label">Live Results</div>
-              <div class="mini-chart">
-                <div class="mini-bar-row">
-                  <span class="mini-bar-name">Candidate #1</span>
-                  <div class="mini-bar-wrap"><div class="mini-bar" style="width:53%;background:var(--primary-light)"></div></div>
-                  <span class="mini-bar-pct">53%</span>
-                </div>
-                <div class="mini-bar-row">
-                  <span class="mini-bar-name">Candidate #2</span>
-                  <div class="mini-bar-wrap"><div class="mini-bar" style="width:38%;background:var(--primary)"></div></div>
-                  <span class="mini-bar-pct">38%</span>
-                </div>
-                <div class="mini-bar-row">
-                  <span class="mini-bar-name">Candidate #3</span>
-                  <div class="mini-bar-wrap"><div class="mini-bar" style="width:21%;background:#C7CCF5"></div></div>
-                  <span class="mini-bar-pct">21%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Floating badge -->
-        <div class="floating-badge badge-secure">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+
+      <!-- Right: SVG illustration (people voting) -->
+      <div class="home-hero-visual">
+        <div class="hero-illustration-wrap">
+          <!-- Monitor / Screen -->
+          <svg viewBox="0 0 420 320" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
+            <!-- Screen body -->
+            <rect x="80" y="30" width="260" height="190" rx="14" fill="#fff" stroke="#E5E7F0" stroke-width="2"/>
+            <rect x="80" y="30" width="260" height="32" rx="14" fill="#3A4FD7"/>
+            <rect x="80" y="46" width="260" height="16" fill="#3A4FD7"/>
+            <!-- Screen dots -->
+            <circle cx="98"  cy="46" r="5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="114" cy="46" r="5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="130" cy="46" r="5" fill="rgba(255,255,255,.5)"/>
+            <!-- Screen content lines -->
+            <rect x="108" y="80"  width="120" height="10" rx="5" fill="#E8EAFF"/>
+            <rect x="108" y="98"  width="80"  height="8"  rx="4" fill="#F0F2FF"/>
+            <rect x="108" y="114" width="100" height="8"  rx="4" fill="#F0F2FF"/>
+            <!-- Vote button on screen -->
+            <rect x="108" y="134" width="90" height="28" rx="14" fill="#3A4FD7"/>
+            <text x="153" y="153" text-anchor="middle" fill="#fff" font-size="11" font-family="sans-serif" font-weight="600">VOTE NOW</text>
+            <!-- Ballot / envelope top -->
+            <rect x="168" y="8" width="64" height="46" rx="6" fill="#FFD166" stroke="#F5A623" stroke-width="1.5"/>
+            <polyline points="168,8 200,32 232,8" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+            <!-- Stand -->
+            <rect x="188" y="220" width="44" height="14" rx="4" fill="#C7CCF5"/>
+            <rect x="172" y="234" width="76" height="10" rx="5" fill="#B0B8F0"/>
+
+            <!-- Person LEFT (woman with phone) -->
+            <!-- head -->
+            <circle cx="58" cy="118" r="18" fill="#FFBE9D"/>
+            <!-- hair -->
+            <ellipse cx="58" cy="108" rx="19" ry="12" fill="#2B2B5E"/>
+            <!-- body -->
+            <rect x="38" y="136" width="40" height="55" rx="10" fill="#E84393"/>
+            <!-- left arm holding phone -->
+            <rect x="18" y="148" width="22" height="12" rx="6" fill="#FFBE9D"/>
+            <rect x="14" y="140" width="14" height="22" rx="4" fill="#3A4FD7"/>
+            <!-- legs -->
+            <rect x="42" y="190" width="14" height="38" rx="6" fill="#2B2B5E"/>
+            <rect x="60" y="190" width="14" height="38" rx="6" fill="#2B2B5E"/>
+            <!-- shoes -->
+            <ellipse cx="49" cy="228" rx="10" ry="5" fill="#1A1D3A"/>
+            <ellipse cx="67" cy="228" rx="10" ry="5" fill="#1A1D3A"/>
+
+            <!-- Person RIGHT (man in orange) -->
+            <!-- head -->
+            <circle cx="362" cy="130" r="18" fill="#FFBE9D"/>
+            <!-- hair -->
+            <ellipse cx="362" cy="120" rx="19" ry="10" fill="#2B2B5E"/>
+            <!-- body -->
+            <rect x="342" y="148" width="40" height="55" rx="10" fill="#F5A623"/>
+            <!-- right arm raised (dropping ballot) -->
+            <rect x="380" y="120" width="12" height="36" rx="6" fill="#FFBE9D"/>
+            <!-- ballot being dropped -->
+            <rect x="376" y="106" width="20" height="16" rx="3" fill="#FFD166" stroke="#F5A623" stroke-width="1"/>
+            <!-- legs -->
+            <rect x="346" y="202" width="14" height="40" rx="6" fill="#2B2B5E"/>
+            <rect x="364" y="202" width="14" height="40" rx="6" fill="#2B2B5E"/>
+            <!-- shoes -->
+            <ellipse cx="353" cy="242" rx="10" ry="5" fill="#1A1D3A"/>
+            <ellipse cx="371" cy="242" rx="10" ry="5" fill="#1A1D3A"/>
+
+            <!-- Ground shadow -->
+            <ellipse cx="58"  cy="232" rx="28" ry="6" fill="rgba(58,79,215,.08)"/>
+            <ellipse cx="362" cy="248" rx="28" ry="6" fill="rgba(58,79,215,.08)"/>
           </svg>
-          100% Secure & Encrypted
-        </div>
-        <div class="floating-badge badge-live">
-          <span class="live-dot"></span> Live Results
         </div>
       </div>
- 
+
+    </div>
+    <div class="hero-wave-bottom"></div>
+  </section>
+
+  <!-- ── 3-Step Process Section ── -->
+  <section class="steps-section">
+    <div class="container steps-grid">
+
+      <div class="step-card step-active">
+        <span class="step-num">Step 1:</span>
+        <h3 class="step-title">SIGN UP</h3>
+        <p class="step-desc">Create an account on this system to vote</p>
+        <a href="{% url 'register' %}" class="btn btn-sm step-btn">Register as a Voter</a>
+      </div>
+
+      <div class="step-card step-dark">
+        <span class="step-num">Step 2:</span>
+        <h3 class="step-title">VOTE</h3>
+        <p class="step-desc">Vote for your preferred candidate</p>
+      </div>
+
+      <div class="step-card step-dark">
+        <span class="step-num">Step 3:</span>
+        <h3 class="step-title">VIEW ELECTION RESULTS</h3>
+        <p class="step-desc">View election results of various candidate</p>
+      </div>
+
     </div>
   </section>
- 
+
+  <!-- ── Tagline Banner ── -->
+  <section class="tagline-section">
+    <div class="container tagline-inner">
+      <p class="tagline-text">
+        Make your decision-making process more modern, safe, and efficient.
+      </p>
+      <p class="tagline-sub">
+        Upgrade from manual ballot counting to an online election system without
+        jeopardizing the integrity of your vote.
+      </p>
+    </div>
+  </section>
+
   <!-- ── Features Section ── -->
-  <section class="features" id="about">
+  <section class="home-features" id="about">
     <div class="container">
-      <div class="section-header text-center">
-        <h2 class="section-title">Why Choose <em>i</em>VOTE?</h2>
-        <p class="section-sub">Everything you need for a transparent and fair election.</p>
+      <div class="home-features-header">
+        <h2 class="home-features-title">Our Features</h2>
+        <p class="home-features-sub">
+          We provide an online voting system that exceed expectations, from secure
+          polling software to the management of complex virtual voting events.
+        </p>
       </div>
-      <div class="features-grid">
-        <div class="feature-card card">
-          <div class="feature-icon" style="background:rgba(58,79,215,.1);color:var(--primary);">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+
+      <div class="home-features-grid">
+
+        <div class="home-feature-item">
+          <div class="home-feature-icon-wrap">
+            <svg width="52" height="52" fill="none" viewBox="0 0 64 64" stroke="#fff" stroke-width="2.2">
+              <circle cx="32" cy="32" r="20" stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M32 20v4M32 40v4M20 32h4M40 32h4
+                   M24.9 24.9l2.8 2.8M36.3 36.3l2.8 2.8
+                   M24.9 39.1l2.8-2.8M36.3 27.7l2.8-2.8"/>
+              <circle cx="32" cy="32" r="6" stroke="#fff" stroke-width="2"/>
+              <path stroke-linecap="round" d="M26 32a6 6 0 016-6"/>
+              <rect x="26" y="36" width="12" height="10" rx="3" stroke="#fff" stroke-width="2"/>
+              <path stroke-linecap="round" d="M29 36v-3a3 3 0 016 0v3"/>
             </svg>
           </div>
-          <h3 class="feature-title">Secure Voting</h3>
-          <p class="feature-desc">End-to-end 256-bit encryption ensures your vote is private and tamper-proof.</p>
+          <h3 class="home-feature-name">Secured Platform</h3>
+          <p class="home-feature-desc">With our system, your data is secured</p>
         </div>
-        <div class="feature-card card">
-          <div class="feature-icon" style="background:rgba(16,185,129,.1);color:#059669;">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+
+        <div class="home-feature-item">
+          <div class="home-feature-icon-wrap">
+            <svg width="52" height="52" fill="none" viewBox="0 0 64 64" stroke="#fff" stroke-width="2.2">
+              <rect x="20" y="12" width="24" height="40" rx="5" stroke="#fff" stroke-width="2"/>
+              <rect x="24" y="18" width="16" height="12" rx="2" stroke="#fff" stroke-width="1.5"/>
+              <path stroke-linecap="round" d="M25 36h14M25 40h10M25 44h8"/>
+              <rect x="27" y="20" width="10" height="6" rx="1" fill="rgba(255,255,255,.25)" stroke="none"/>
+              <text x="32" y="26" text-anchor="middle" fill="#fff" font-size="5" font-family="sans-serif" font-weight="700">VOTE</text>
             </svg>
           </div>
-          <h3 class="feature-title">Real-Time Results</h3>
-          <p class="feature-desc">Watch election results update live as votes come in — fully transparent.</p>
+          <h3 class="home-feature-name">Vote Online</h3>
+          <p class="home-feature-desc">In just few clicks, you can vote your preferred candidates</p>
         </div>
-        <div class="feature-card card">
-          <div class="feature-icon" style="background:rgba(245,158,11,.1);color:#D97706;">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+
+        <div class="home-feature-item">
+          <div class="home-feature-icon-wrap">
+            <svg width="52" height="52" fill="none" viewBox="0 0 64 64" stroke="#fff" stroke-width="2.2">
+              <!-- 3 people -->
+              <circle cx="22" cy="22" r="6" stroke="#fff" stroke-width="2"/>
+              <path stroke-linecap="round" d="M12 44c0-6 4-10 10-10"/>
+              <circle cx="42" cy="22" r="6" stroke="#fff" stroke-width="2"/>
+              <path stroke-linecap="round" d="M52 44c0-6-4-10-10-10"/>
+              <circle cx="32" cy="20" r="7" stroke="#fff" stroke-width="2"/>
+              <path stroke-linecap="round" d="M20 44c0-7 5-12 12-12s12 5 12 12"/>
+              <!-- bar chart -->
+              <rect x="16" y="34" width="6"  height="14" rx="2" fill="rgba(255,255,255,.35)" stroke="none"/>
+              <rect x="25" y="28" width="6"  height="20" rx="2" fill="rgba(255,255,255,.55)" stroke="none"/>
+              <rect x="34" y="22" width="6"  height="26" rx="2" fill="rgba(255,255,255,.75)" stroke="none"/>
+              <line x1="14" y1="48" x2="50" y2="48" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <h3 class="feature-title">Vote Anywhere</h3>
-          <p class="feature-desc">Cast your vote from any device — mobile, tablet, or desktop — anytime.</p>
+          <h3 class="home-feature-name">Real Time Results</h3>
+          <p class="home-feature-desc">View real time voting results and scores of each candidates</p>
         </div>
-        <div class="feature-card card">
-          <div class="feature-icon" style="background:rgba(239,68,68,.1);color:#DC2626;">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Voter Verification</h3>
-          <p class="feature-desc">Multi-step identity verification ensures only eligible voters participate.</p>
-        </div>
+
       </div>
     </div>
   </section>
- 
-  <!-- ── CTA Section ── -->
-  <section class="cta-section" id="contact">
-    <div class="container">
-      <div class="cta-card">
-        <div class="cta-bg-circle c1"></div>
-        <div class="cta-bg-circle c2"></div>
-        <h2 class="cta-title">Ready to make your vote count?</h2>
-        <p class="cta-sub">Join thousands of voters already using iVOTE for secure, transparent elections.</p>
-        <div class="cta-actions">
-          <a href="{% url 'register' %}" class="btn btn-primary btn-lg" style="background:#fff;color:var(--primary);">
-            Register Now — It's Free
-          </a>
-          <a href="{% url 'login' %}" class="btn btn-lg" style="color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;padding:16px 32px;">
-            Sign In
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
- 
-  <!-- ── Footer ── -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="navbar-brand" style="color:var(--text-secondary);">
-        <div class="brand-logo" style="background:var(--primary);color:#fff;">
-          <span>i</span>V
-        </div>
-        <span class="logo-text" style="color:var(--text-primary)"><em>i</em>VOTE</span>
-      </div>
-      <p class="footer-copy">© 2024 iVOTE Online Voting System. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="#" class="footer-link">Privacy Policy</a>
-        <a href="#" class="footer-link">Terms of Use</a>
-        <a href="#" class="footer-link">Help</a>
-      </div>
-    </div>
-  </footer>
- 
-</body>
-</html>
+
+{% endblock %}
+

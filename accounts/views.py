@@ -31,7 +31,9 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            if user.role == 'organizer':
+            if user.is_superuser:
+                return redirect('/admin')
+            elif user.role == 'organizer':
                 return redirect('organizer_dashboard')
             else:
                 return redirect('voter_dashboard')  # ← default fallback
@@ -77,11 +79,23 @@ def voter_dashboard(request):
         has_applied = Candidate.objects.filter(
             user=request.user, election=election
         ).exists()
+
+        # ── vote percentage per candidate ──────────────────────
+        total_votes = Votes.objects.filter(election=election).count()
+        candidates = election.candidates.filter(status='approved')
+        for candidate in candidates:
+            c_votes = Votes.objects.filter(candidate=candidate).count()
+            candidate.vote_percentage = round(
+                (c_votes / total_votes * 100) if total_votes > 0 else 0
+            )
+        # ───────────────────────────────────────────────────────
+
         election_with_status.append({
             'election':    election,
             'has_voted':   has_voted,
             'has_applied': has_applied,
         })
+
         if has_voted:
             voted_count += 1
         if election.status == 'active' and not has_voted:
@@ -96,12 +110,10 @@ def voter_dashboard(request):
     candidacy_data = []
     for candidacy in my_candidacies:
         votes_received = Votes.objects.filter(candidate=candidacy).count()
-
         audit = AuditRequest.objects.filter(
             candidate=candidacy,
             election=candidacy.election
         ).first()
-
         candidacy_data.append({
             'election':       candidacy.election,
             'status':         candidacy.status,
@@ -115,8 +127,8 @@ def voter_dashboard(request):
         'voted_count':          voted_count,
         'pending_count':        pending_count,
         'completed_count':      completed_count,
-        'my_candidacies':       candidacy_data,        # ← new
-        'is_candidate':         my_candidacies.exists(), # ← new
+        'my_candidacies':       candidacy_data,
+        'is_candidate':         my_candidacies.exists(),
     })
 
 
