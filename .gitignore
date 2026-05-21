@@ -8,7 +8,7 @@ venv/
 
 # Django
 *.sqlite3
-/static/
+/staticfiles/
 media/
 
 # Environment variables
@@ -20,3 +20,6 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+docker-compose.override.yml
