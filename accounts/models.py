@@ -5,7 +5,8 @@ class CustomUser(AbstractUser):
 
     ROLE_CHOICES = [
         ('voter',     'Voter'),
-        ('organizer', 'Organizer'),  # ← 'admin' renamed to 'organizer'
+        ('organizer', 'Organizer'),
+        ('admin',     'Admin'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='voter')
 
@@ -17,5 +18,11 @@ class CustomUser(AbstractUser):
         help_text="Citizenship No. / Student ID / Phone Number"
     )
 
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.username} ({self.role})"
+

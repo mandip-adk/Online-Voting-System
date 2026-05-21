@@ -2,12 +2,59 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    fieldsets = UserAdmin.fieldsets + (
-        ('Role & Identity', {'fields': ('role', 'voter_id')}),  # ← added voter_id
-    )
-    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'voter_id']  # ← added
-    list_filter  = ['role']  # ← filter by role in sidebar
 
-admin.site.register(CustomUser, CustomUserAdmin)
+
+# CUSTOM USER ADMIN
+
+
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+
+    list_display = (
+        'username',
+        'email',
+        'voter_id',
+        'role',
+        'is_active',
+        'date_joined'
+    )
+
+    list_filter = (
+        'role',
+        'is_active'
+    )
+
+    search_fields = (
+        'username',
+        'email',
+        'voter_id'
+    )
+
+    ordering = ('-date_joined',)
+
+    fieldsets = UserAdmin.fieldsets + (
+        ('iVote Info', {
+            'fields': (
+                'role',
+                'voter_id'
+            )
+        }),
+    )
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('iVote Info', {
+            'fields': (
+                'role',
+                'voter_id'
+            )
+        }),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return self.readonly_fields + (
+                'is_superuser',
+                'user_permissions',
+                'groups',
+            )
+        return self.readonly_fields
