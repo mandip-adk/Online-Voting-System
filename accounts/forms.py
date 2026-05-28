@@ -33,3 +33,17 @@ class RegisterForm(UserCreationForm):
                 "This ID is already registered. Each person can only have one account."
             )
         return voter_id
+
+
+from .models import ContactMessage
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'subject', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Full Name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your Email Address'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject of Message'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write your message here...', 'rows': 5}),
+        }

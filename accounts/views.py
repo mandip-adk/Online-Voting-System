@@ -247,4 +247,33 @@ def admin_dashboard(request):
         'recent_users':            recent_users,
     })
 
-    
+
+def contact_us(request):
+    from .forms import ContactForm
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your message has been sent successfully! We will get back to you soon.")
+            return redirect('contact')
+        else:
+            messages.error(request, "Failed to send message. Please correct the errors in the form.")
+    else:
+        form = ContactForm()
+    return render(request, 'contact_us.html', {'form': form})
+
+
+def faqs(request):
+    return render(request, 'faqs.html')
+
+
+@login_required
+def settings_view(request):
+    return render(request, 'accounts/settings.html')
+
+
+@login_required
+def edit_profile(request):
+    return render(request, 'accounts/edit_profile.html', {
+        'user': request.user
+    })

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us — iVOTE{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/contact_faqs.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1 class="page-title">Contact Our Team</h1>
+    <p class="page-subtitle">
+      Have a question, feedback, or need technical assistance with your election? 
+      Our team is here to help you coordinate a secure and smooth voting experience.
+    </p>
+  </header>
+
+  <!-- Split Grid -->
+  <div class="contact-grid">
+    
+    <!-- Left: Organization Details -->
+    <div class="contact-info-panel">
+      <div class="info-panel-top">
+        <h3>Contact Information</h3>
+        <p>You can also reach out to us directly through the channels below. We are ready to support your organization.</p>
+        
+        <div class="info-details-list">
+          <!-- Address -->
+          <div class="info-detail-item">
+            <div class="info-icon-wrap">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="info-detail-content">
+              <h4>Our Location</h4>
+              <p>Chitwan, Nepal</p>
+            </div>
+          </div>
+          
+          <!-- Email -->
+          <div class="info-detail-item">
+            <div class="info-icon-wrap">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div class="info-detail-content">
+              <h4>Email Support</h4>
+              <p><a href="mailto:ivote@email.com">ivote@email.com</a></p>
+            </div>
+          </div>
+          
+          <!-- Phone -->
+          <div class="info-detail-item">
+            <div class="info-icon-wrap">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <div class="info-detail-content">
+              <h4>Call Us</h4>
+              <p><a href="tel:+9779800000000">+977 9800000000</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel-socials">
+        <p>Follow Us On Social Media</p>
+        <div class="info-social-links">
+          <a href="#" class="info-social-icon" aria-label="Facebook">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+          </a>
+          <a href="#" class="info-social-icon" aria-label="Twitter">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+            </svg>
+          </a>
+          <a href="#" class="info-social-icon" aria-label="LinkedIn">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Contact Form -->
+    <div class="contact-card-form">
+      <h2 class="contact-form-title">Send a Message</h2>
+      <p class="contact-form-desc">Fill out the form below, and we will get back to you within 24 hours.</p>
+      
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}" class="form-label">
+                {{ field.label }}
+                {% if field.field.required %}<span style="color: var(--accent);">*</span>{% endif %}
+              </label>
+              <div class="input-wrapper">
+                {{ field }}
+              </div>
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  <span class="field-error">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+              {% if field.help_text %}
+                <span class="field-help">{{ field.help_text|safe }}</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+          
+          <div style="margin-top: 10px;">
+            <button type="submit" class="btn btn-primary btn-full">
+              Send Message
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+
+</div>
+{% endblock %}
