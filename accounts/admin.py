@@ -49,7 +49,6 @@ class CustomUserAdmin(UserAdmin):
             )
         }),
     )
-
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_superuser:
             return self.readonly_fields + (
@@ -58,3 +57,14 @@ class CustomUserAdmin(UserAdmin):
                 'groups',
             )
         return self.readonly_fields
+
+
+from .models import ContactMessage
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'submitted_at')
+    list_filter = ('submitted_at',)
+    search_fields = ('name', 'email', 'subject', 'message')
+    ordering = ('-submitted_at',)
+    readonly_fields = ('name', 'email', 'subject', 'message', 'submitted_at')

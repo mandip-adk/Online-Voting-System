@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions — iVOTE{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/contact_faqs.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1 class="page-title">Frequently Asked Questions</h1>
+    <p class="page-subtitle">
+      Find quick answers to the most common questions about the iVOTE online election platform, 
+      voter eligibility, and security verification.
+    </p>
+  </header>
+
+  <!-- Live Search Bar -->
+  <div class="search-container">
+    <input type="text" id="faqSearch" class="faq-search-input" placeholder="Search for questions or keywords..." aria-label="Search FAQs" />
+    <span class="faq-search-icon">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </span>
+  </div>
+
+  <!-- FAQs Accordion -->
+  <div class="faq-accordion-wrap">
+    
+    <!-- Question 1 -->
+    <div class="faq-item">
+      <button class="faq-header" aria-expanded="false">
+        <span class="faq-question">How do I register as a voter in the system?</span>
+        <span class="faq-toggle-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-body">
+        <div class="faq-content">
+          <p>
+            To vote in any election, you must register by creating an account. Click the <strong>Register</strong> button in the upper-right corner of the home page. Provide your username, full name, email address, a unique ID (e.g. Student ID, Citizenship No., or Phone Number), and select your role as a <strong>Voter</strong>. Once registered, you will be able to access your voter dashboard.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="faq-item">
+      <button class="faq-header" aria-expanded="false">
+        <span class="faq-question">Is my vote completely secured and confidential?</span>
+        <span class="faq-toggle-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-body">
+        <div class="faq-content">
+          <p>
+            Yes, confidentiality and integrity are the core principles of iVOTE. When you cast a ballot, your voting token is decoupled from your profile, creating an anonymous entry in the votes database. While the system registers that you have participated in an election to prevent double voting (Voter Participation tracking), it is cryptographically impossible to link your identity to the specific candidate you voted for.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="faq-item">
+      <button class="faq-header" aria-expanded="false">
+        <span class="faq-question">How do I create and manage elections as an Organizer?</span>
+        <span class="faq-toggle-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-body">
+        <div class="faq-content">
+          <p>
+            If you want to host an election, register with the role <strong>Organizer</strong>. On your dashboard, you will have access to an intuitive panel where you can create new elections, specify start/end dates, set eligibility configurations (open to all, restricted by email domains, or restricted by unique voter ID lists), and approve or reject candidate applications.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="faq-item">
+      <button class="faq-header" aria-expanded="false">
+        <span class="faq-question">What is an Audit Request and why is it important?</span>
+        <span class="faq-toggle-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-body">
+        <div class="faq-content">
+          <p>
+            To guarantee absolute transparency, candidates can submit an **Audit Request** for their elections. This request invokes a verification scan of all cryptographic voting tokens generated during the election. An administrator reviews the logs to confirm that all cast votes align with individual voter participation logs, ensuring that no votes were manipulated, injected, or lost.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="faq-item">
+      <button class="faq-header" aria-expanded="false">
+        <span class="faq-question">Can I view the election results in real-time?</span>
+        <span class="faq-toggle-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-body">
+        <div class="faq-content">
+          <p>
+            Yes! For active and closed elections, you can view real-time scorecards and percentage metrics on your Voter Dashboard or Organizer Dashboard. The system dynamically updates the results as votes are cast. Once an election is closed, the final tally is locked and certified for publication.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Search No Results -->
+  <div id="noResults" class="faq-no-results">
+    <svg width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted); margin: 0 auto;">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h3 class="faq-no-results-title">No matching questions found</h3>
+    <p class="faq-no-results-desc">Try using different keywords or clear the search input to see all topics.</p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const faqItems = document.querySelectorAll('.faq-item');
+    const faqHeaders = document.querySelectorAll('.faq-header');
+    const searchInput = document.getElementById('faqSearch');
+    const noResults = document.getElementById('noResults');
+
+    // Accordion Toggle
+    faqHeaders.forEach(header => {
+      header.addEventListener('click', function () {
+        const item = this.parentElement;
+        const body = item.querySelector('.faq-body');
+        const isActive = item.classList.contains('active');
+
+        // Close other items
+        faqItems.forEach(otherItem => {
+          if (otherItem !== item && otherItem.classList.contains('active')) {
+            otherItem.classList.remove('active');
+            otherItem.querySelector('.faq-body').style.maxHeight = '0';
+            otherItem.querySelector('.faq-body').style.opacity = '0';
+            otherItem.querySelector('.faq-header').setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Toggle current item
+        if (isActive) {
+          item.classList.remove('active');
+          body.style.maxHeight = '0';
+          body.style.opacity = '0';
+          this.setAttribute('aria-expanded', 'false');
+        } else {
+          item.classList.add('active');
+          body.style.maxHeight = body.scrollHeight + 'px';
+          body.style.opacity = '1';
+          this.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    // Real-Time Search Filter
+    searchInput.addEventListener('input', function () {
+      const filter = this.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      faqItems.forEach(item => {
+        const questionText = item.querySelector('.faq-question').textContent.toLowerCase();
+        const contentText = item.querySelector('.faq-content').textContent.toLowerCase();
+
+        if (questionText.includes(filter) || contentText.includes(filter)) {
+          item.style.display = 'block';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+          // Close if it was active
+          if (item.classList.contains('active')) {
+            item.classList.remove('active');
+            const body = item.querySelector('.faq-body');
+            body.style.maxHeight = '0';
+            body.style.opacity = '0';
+            item.querySelector('.faq-header').setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+
+      // Toggle no results message
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    });
+  });
+</script>
+{% endblock %}
