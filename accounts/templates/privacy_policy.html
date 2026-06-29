@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy — iVOTE{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/contact_faqs.css' %}" />
+<style>
+  .privacy-content-wrap {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+  .privacy-section {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    padding: 40px;
+    margin-bottom: 30px;
+    transition: var(--transition);
+  }
+  .privacy-section:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .privacy-section h2 {
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid rgba(58, 79, 215, 0.08);
+    padding-bottom: 10px;
+  }
+  .privacy-section h2 svg {
+    color: var(--primary);
+  }
+  .privacy-section p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .privacy-section ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+  .privacy-section li {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .privacy-section p:last-child {
+    margin-bottom: 0;
+  }
+  .last-updated {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: -10px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1 class="page-title">Privacy Policy</h1>
+    <p class="page-subtitle">
+      How we collect, protect, and use your data to maintain a secure and anonymous voting environment.
+    </p>
+  </header>
+  
+  <p class="last-updated">Last Updated: June 29, 2026</p>
+
+  <!-- Main Content Wrap -->
+  <div class="privacy-content-wrap">
+    
+    <!-- Section 1: Information We Collect -->
+    <section class="privacy-section">
+      <h2>
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Information We Collect
+      </h2>
+      <p>
+        To provide a secure and reliable voting platform, we collect a limited amount of personal data:
+      </p>
+      <ul>
+        <li><strong>Account Information:</strong> Your username, full name, email address, and role choice (Voter or Organizer) when you register.</li>
+        <li><strong>Verification Identifier:</strong> A unique identifier (e.g., student ID, employee number, or phone number) to verify eligibility and prevent duplicate voter registrations.</li>
+        <li><strong>Participation Logs:</strong> We record the list of elections in which you have voted to enforce the "one person, one vote" rule.</li>
+      </ul>
+    </section>
+
+    <!-- Section 2: Complete Ballot Anonymity -->
+    <section class="privacy-section">
+      <h2>
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+        Complete Ballot Anonymity
+      </h2>
+      <p>
+        We employ a strict cryptographic separation of identity and vote records:
+      </p>
+      <ul>
+        <li><strong>Decoupled Votes:</strong> When you cast a ballot, the vote is stored anonymously in a separate database table. The connection between your user account and the specific selection is immediately discarded.</li>
+        <li><strong>No Tracking:</strong> Neither election organizers, administrators, nor other voters can see who you voted for.</li>
+      </ul>
+    </section>
+
+    <!-- Section 3: Data Security -->
+    <section class="privacy-section">
+      <h2>
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        Data Security
+      </h2>
+      <p>
+        We secure your data using industry-standard protocols, including SSL/TLS encryption for all data in transit, secure database hashing for user passwords, and restricted administrative permissions.
+      </p>
+    </section>
+
+    <!-- Section 4: Contact Us -->
+    <section class="privacy-section">
+      <h2>
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        Contact Our Privacy Team
+      </h2>
+      <p>
+        If you have questions regarding this Privacy Policy or how your voter data is managed, please contact us at <a href="mailto:privacy@ivote.com" style="color: var(--primary); text-decoration: underline;">privacy@ivote.com</a> or visit our <a href="{% url 'contact' %}" style="color: var(--primary); text-decoration: underline;">Contact Us</a> page.
+      </p>
+    </section>
+
+  </div>
+
+</div>
+{% endblock %}

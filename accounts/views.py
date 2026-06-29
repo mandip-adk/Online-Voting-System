@@ -277,3 +277,15 @@ def edit_profile(request):
     return render(request, 'accounts/edit_profile.html', {
         'user': request.user
     })
+
+
+def about_view(request):
+    return render(request, 'about.html')
+
+
+def privacy_policy_view(request):
+    return render(request, 'privacy_policy.html')
+
+
+def terms_of_service_view(request):
+    return render(request, 'terms_of_service.html')

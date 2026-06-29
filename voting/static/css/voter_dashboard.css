@@ -69,6 +69,7 @@
   padding: 20px 0 28px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 20px;
+  text-decoration: none;
 }
 .vd-avatar {
   width: 72px; height: 72px;
@@ -97,7 +98,7 @@
   font-family: var(--font-head);
   font-weight: 500;
 }
-.vd-profile-link:hover { text-decoration: underline; }
+.vd-profile:hover .vd-profile-link { text-decoration: underline; }
 
 /* Nav items */
 .vd-nav {

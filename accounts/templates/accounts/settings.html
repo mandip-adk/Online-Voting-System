@@ -25,13 +25,13 @@
     </a>
 
     <!-- Avatar -->
-    <div class="vd-profile">
+    <a href="{% url 'edit_profile' %}" class="vd-profile">
       <div class="vd-avatar">
         {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
       </div>
       <h3 class="vd-profile-name">{{ user.get_full_name|default:user.username }}</h3>
-      <a href="#" class="vd-profile-link">View Profile &rsaquo;</a>
-    </div>
+      <span class="vd-profile-link">View Profile &rsaquo;</span>
+    </a>
 
     <!-- Nav -->
     <nav class="vd-nav">
@@ -216,7 +216,7 @@
           <h2 class="settings-col-title">Links</h2>
           <div class="settings-list">
 
-            <a href="{% url 'home' %}#about" class="settings-item">
+            <a href="{% url 'about' %}" class="settings-item">
               <span class="settings-item-left">
                 <span class="settings-item-icon">
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -232,7 +232,7 @@
               </span>
             </a>
 
-            <a href="#" class="settings-item">
+            <a href="{% url 'terms_of_service' %}" class="settings-item">
               <span class="settings-item-left">
                 <span class="settings-item-icon">
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -248,7 +248,7 @@
               </span>
             </a>
 
-            <a href="#" class="settings-item">
+            <a href="{% url 'privacy_policy' %}" class="settings-item">
               <span class="settings-item-left">
                 <span class="settings-item-icon">
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

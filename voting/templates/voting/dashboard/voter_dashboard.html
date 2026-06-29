@@ -24,13 +24,13 @@
     </a>
 
     <!-- Avatar -->
-    <div class="vd-profile">
+    <a href="{% url 'edit_profile' %}" class="vd-profile">
       <div class="vd-avatar">
         {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
       </div>
       <h3 class="vd-profile-name">{{ user.get_full_name|default:user.username }}</h3>
-      <a href="#" class="vd-profile-link">View Profile &rsaquo;</a>
-    </div>
+      <span class="vd-profile-link">View Profile &rsaquo;</span>
+    </a>
 
     <!-- Nav -->
     <nav class="vd-nav">
