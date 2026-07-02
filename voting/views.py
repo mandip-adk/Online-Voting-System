@@ -1,359 +1,112 @@
-from django.shortcuts import render, redirect
-from .models import Election, Candidate, VoterParticipation, Votes
-from .forms import ElectionForm, CandidateApplicationForm
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from django.db.models import Count
-from accounts.models import CustomUser
-from django.utils import timezone
+from .models import Election, Contest, ContestCandidate, ElectoralRoll, Vote
 
 
 @login_required
 def election_list(request):
-    elections = Election.objects.all()
-    for election in elections:
-        election.sync_status()
-    elections = Election.objects.all()
-    return render(request, 'voting/election_list.html', {
-        'elections':     elections,
-        'active_count':  elections.filter(status='active').count(),
-        'pending_count': elections.filter(status='pending').count(),
-        'closed_count':  elections.filter(status='closed').count(),
-    })
+    elections = Election.objects.filter(created_by=request.user).order_by('-start_date')
+    for e in elections:
+        e.sync_status()
+    elections = Election.objects.filter(created_by=request.user).order_by('-start_date')
+    return render(request, 'voting/election_list.html', {'elections': elections})
 
 
 @login_required
-def election_details(request, pk):
-    election = get_object_or_404(Election, pk=pk)
+def election_detail(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
     election.sync_status()
-
-    # Only show approved candidates
-    candidates = Candidate.objects.filter(election=election, status='approved')
-
-    has_voted = VoterParticipation.objects.filter(
-        user=request.user, election=election
-    ).exists()
-
-    # Turnout calculation
-    total_registered = VoterParticipation.objects.filter(election=election).count()
-    participated     = election.participations.count()
-    turnout_pct      = round(participated / total_registered * 100) \
-                       if total_registered > 0 else 0
-
-    # Check eligibility
-    is_eligible = election.is_eligible(request.user)
-
-    return render(request, "voting/election_details.html", {
-        'election':    election,
-        'candidates':  candidates,
-        'has_voted':   has_voted,
-        'turnout_pct': turnout_pct,
-        'is_eligible': is_eligible,
-    })
+    return render(request, 'voting/election_detail.html', {'election': election})
 
 
 @login_required
 def create_election(request):
-    if request.user.role != 'organizer':
-        messages.error(request, "Only organizers can create elections.")
-        return redirect('home')
+    return render(request, 'voting/create_election.html')
 
-    if request.method == 'POST':
-        form = ElectionForm(request.POST)
-        if form.is_valid():
-            election = form.save(commit=False)
-            election.created_by = request.user
-            election.save()
-            messages.success(request, f"Election '{election.title}' created successfully.")
-            return redirect('organizer_dashboard')
-    else:
-        form = ElectionForm()
-
-    return render(request, 'voting/create_election.html', {'form': form})
-
-
-@login_required
-def cast_vote(request, pk):
-    if request.user.role != 'voter':
-        messages.error(request, "Only voters can cast votes.")
-        return redirect('home')
-
-    election = get_object_or_404(Election, pk=pk)
-    election.sync_status()
-
-    if election.status != 'active':
-        messages.error(request, "This election is not currently active.")
-        return redirect('voting:election_detail', pk=pk)
-
-    # ── ELIGIBILITY CHECK ──
-    if not election.is_eligible(request.user):
-        if election.eligibility_type == 'domain':
-            messages.error(
-                request,
-                f"This election is only open to users with a "
-                f"@{election.eligibility_value} email address."
-            )
-        elif election.eligibility_type == 'id_list':
-            messages.error(
-                request,
-                "Your Voter ID is not on the eligible list for this election."
-            )
-        return redirect('voting:election_detail', pk=pk)
-
-    already_voted = VoterParticipation.objects.filter(
-        user=request.user, election=election
-    ).exists()
-
-    if already_voted:
-        messages.error(request, "You have already cast your vote in this election.")
-        return redirect('voting:result', pk=pk)
-
-    if request.method == 'POST':
-        candidate_id = request.POST.get('candidate')
-        candidate    = get_object_or_404(Candidate, pk=candidate_id, election=election)
-
-        Votes.objects.create(
-            election=election,
-            candidate=candidate,
-            voted_at=timezone.now()
-        )
-        VoterParticipation.objects.create(
-            user=request.user,
-            election=election,
-            voted_at=timezone.now()
-        )
-        messages.success(request, "Your vote has been cast successfully! 🎉")
-        return redirect('voting:result', pk=pk)
-    else:
-        candidates = election.candidates.filter(status='approved')  # ← only approved candidates
-        return render(request, "voting/cast_vote.html", {
-            'candidates': candidates,
-            'election':   election,
-        })
-
-
-@login_required
-def election_result(request, pk):
-    election = get_object_or_404(Election, pk=pk)
-
-    candidates = Candidate.objects.filter(election=election)\
-        .annotate(vote_count=Count('votes'))\
-        .order_by('-vote_count')
-
-    total_votes      = election.votes.count()
-    total_registered = VoterParticipation.objects.filter(election=election).count()
-    participated     = election.participations.count()
-
-    turnout_pct = round(participated / total_registered * 100) \
-                  if total_registered > 0 else 0
-
-    candidates_with_pct = []
-    for candidate in candidates:
-        candidate.percentage = round(
-            candidate.vote_count / total_votes * 100, 1
-        ) if total_votes > 0 else 0
-        candidates_with_pct.append(candidate)
-
-    winner = candidates_with_pct[0] if candidates_with_pct else None
-
-    recent_participations = VoterParticipation.objects\
-        .filter(election=election)\
-        .order_by('-voted_at')[:5]
-
-    return render(request, "voting/result.html", {
-        'election':              election,
-        'candidates':            candidates_with_pct,
-        'total_votes':           total_votes,
-        'total_registered':      total_registered,
-        'turnout_pct':           turnout_pct,
-        'recent_participations': recent_participations,
-        'winner':                winner,
-    })
-
-
-@login_required
-def apply_candidate(request, pk):
-    if request.user.role != 'voter':
-        messages.error(request, "Only voters can apply as candidates.")
-        return redirect('home')
-
-    election = get_object_or_404(Election, pk=pk)
-
-    if election.status != 'pending':
-        messages.error(request, "Applications are only open for pending elections.")
-        return redirect('voting:election_detail', pk=pk)
-
-    already_applied = Candidate.objects.filter(
-        user=request.user, election=election
-    ).exists()
-
-    if already_applied:
-        messages.error(request, "You have already applied for this election.")
-        return redirect('voter_dashboard')
-
-    if request.method == 'POST':
-        form = CandidateApplicationForm(request.POST)
-        if form.is_valid():
-            candidate          = form.save(commit=False)
-            candidate.user     = request.user
-            candidate.election = election
-            candidate.status   = 'pending'
-            candidate.save()
-            messages.success(request, "Application submitted! Waiting for organizer approval.")
-            return redirect('voter_dashboard')
-    else:
-        form = CandidateApplicationForm()
-
-    return render(request, 'voting/apply_candidate.html', {
-        'form':     form,
-        'election': election,
-    })
-
-
-@login_required
-def approve_candidate(request, pk):
-    if request.user.role != 'organizer':
-        messages.error(request, "Only organizers can approve candidates.")
-        return redirect('home')
-
-    candidate = get_object_or_404(Candidate, pk=pk)
-
-    if candidate.election.created_by != request.user:
-        messages.error(request, "You do not have permission to manage this election.")
-        return redirect('organizer_dashboard')
-
-    candidate.status = 'approved'
-    candidate.save()
-    messages.success(request, f"{candidate.user.get_full_name()} approved as candidate.")
-    return redirect('organizer_dashboard')
-
-
-@login_required
-def reject_candidate(request, pk):
-    if request.user.role != 'organizer':
-        messages.error(request, "Only organizers can reject candidates.")
-        return redirect('home')
-
-    candidate = get_object_or_404(Candidate, pk=pk)
-
-    if candidate.election.created_by != request.user:
-        messages.error(request, "You do not have permission to manage this election.")
-        return redirect('organizer_dashboard')
-
-    candidate.status = 'rejected'
-    candidate.save()
-    messages.success(request, f"{candidate.user.get_full_name()} rejected.")
-    return redirect('organizer_dashboard')
 
 @login_required
 def edit_election(request, pk):
-    if request.user.role != 'organizer':
-        messages.error(request, "Only organizers can edit elections.")
-        return redirect('home')
-
-    election = get_object_or_404(Election, pk=pk)
-
-    # Only the creator can edit
-    if election.created_by != request.user:
-        messages.error(request, "You can only edit your own elections.")
-        return redirect('organizer_dashboard')
-
-    # Can't edit active or closed elections
-    if election.status != 'pending':
-        messages.error(request, "You can only edit pending elections.")
-        return redirect('organizer_dashboard')
-
-    if request.method == 'POST':
-        form = ElectionForm(request.POST, instance=election)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Election '{election.title}' updated successfully.")
-            return redirect('organizer_dashboard')
-    else:
-        form = ElectionForm(instance=election)
-
-    return render(request, 'voting/edit_election.html', {
-        'form':     form,
-        'election': election,
-    })
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    return render(request, 'voting/edit_election.html', {'election': election})
 
 
 @login_required
 def delete_election(request, pk):
-    if request.user.role != 'organizer':
-        messages.error(request, "Only organizers can delete elections.")
-        return redirect('home')
-
-    election = get_object_or_404(Election, pk=pk)
-
-    # Only the creator can delete
-    if election.created_by != request.user:
-        messages.error(request, "You can only delete your own elections.")
-        return redirect('organizer_dashboard')
-
-    # Can't delete active or closed elections
-    if election.status != 'pending':
-        messages.error(request, "You can only delete pending elections.")
-        return redirect('organizer_dashboard')
-
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
     if request.method == 'POST':
-        title = election.title
         election.delete()
-        messages.success(request, f"Election '{title}' deleted successfully.")
-        return redirect('organizer_dashboard')
+        messages.success(request, "Election deleted.")
+        return redirect('voting:election_list')
+    return render(request, 'voting/delete_election.html', {'election': election})
 
-    return render(request, 'voting/delete_election.html', {
+
+@login_required
+def add_contest(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    return render(request, 'voting/add_contest.html', {'election': election})
+
+
+@login_required
+def edit_contest(request, pk, ck):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    contest  = get_object_or_404(Contest, pk=ck, election=election)
+    return render(request, 'voting/edit_contest.html', {'election': election, 'contest': contest})
+
+
+@login_required
+def delete_contest(request, pk, ck):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    contest  = get_object_or_404(Contest, pk=ck, election=election)
+    if request.method == 'POST':
+        contest.delete()
+        messages.success(request, "Contest deleted.")
+        return redirect('voting:election_detail', pk=pk)
+    return render(request, 'voting/delete_contest.html', {'election': election, 'contest': contest})
+
+
+@login_required
+def upload_electoral_roll(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    return render(request, 'voting/upload_electoral_roll.html', {'election': election})
+
+
+@login_required
+def voter_participation(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    roll = election.electoral_roll.all().order_by('email')
+    return render(request, 'voting/voter_participation.html', {
         'election': election,
+        'roll':     roll,
     })
 
 
-import csv
-import io
-from .forms import CSVUploadForm
+@login_required
+def election_results(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    return render(request, 'voting/election_results.html', {'election': election})
+
 
 @login_required
-def upload_eligible_voters(request, election_id):
-    election = get_object_or_404(Election, id=election_id, created_by=request.user)
+def send_voting_emails(request, pk):
+    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    return render(request, 'voting/send_emails.html', {'election': election})
 
-    # Only makes sense for id_list elections
-    if election.eligibility_type != 'id_list':
-        messages.error(request, "This election does not use ID list eligibility.")
-        return redirect('election_detail', election_id=election.id)
 
-    if request.method == 'POST':
-        form = CSVUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            csv_file = request.FILES['csv_file']
+# ── Public ballot views (no login required) ───────────────────────────────────
 
-            # Read and decode
-            decoded = csv_file.read().decode('utf-8')
-            reader = csv.reader(io.StringIO(decoded))
+def ballot(request, token):
+    roll = get_object_or_404(ElectoralRoll, token=token)
+    return render(request, 'voting/ballot.html', {'roll': roll})
 
-            new_ids = []
-            for row in reader:
-                if row:  # skip empty rows
-                    voter_id = row[0].strip()
-                    if voter_id:
-                        new_ids.append(voter_id)
 
-            if not new_ids:
-                messages.error(request, "No valid voter IDs found in the CSV.")
-                return render(request, 'voting/upload_voters.html', {'form': form, 'election': election})
+def submit_vote(request, token):
+    roll = get_object_or_404(ElectoralRoll, token=token)
+    return render(request, 'voting/ballot.html', {'roll': roll})
 
-            # Merge with existing IDs
-            existing = [
-                vid.strip()
-                for vid in (election.eligibility_value or '').split(',')
-                if vid.strip()
-            ]
-            merged = list(set(existing + new_ids))  # remove duplicates
-            election.eligibility_value = ','.join(merged)
-            election.save()
 
-            messages.success(request, f"{len(new_ids)} voter IDs uploaded. Total: {len(merged)}.")
-            return redirect('election_detail', election_id=election.id)
-    else:
-        form = CSVUploadForm()
+def vote_receipt(request, token):
+    roll = get_object_or_404(ElectoralRoll, token=token)
+    return render(request, 'voting/vote_receipt.html', {'roll': roll})
 
-    return render(request, 'voting/upload_voters.html', {'form': form, 'election': election})
+

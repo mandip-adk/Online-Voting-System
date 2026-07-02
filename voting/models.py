@@ -1,45 +1,27 @@
 from django.db import models
-from django.conf import settings
-import uuid
 from django.utils import timezone
+import uuid
+
 
 class Election(models.Model):
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('active',  'Active'),
         ('closed',  'Closed'),
     ]
-    ELIGIBILITY_CHOICES = [
-        ('open',   'Open — Anyone registered can vote'),
-        ('domain', 'Domain — Only specific email domain'),
-        ('id_list','ID List — Only specific voter IDs'),
-    ]
 
-    title             = models.CharField(max_length=50)
-    start_date        = models.DateTimeField()
-    end_date          = models.DateTimeField()
-    status            = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    created_by        = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    title       = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    start_date  = models.DateTimeField()
+    end_date    = models.DateTimeField()
+    status      = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_by  = models.ForeignKey(
+        'accounts.CustomUser',
         on_delete=models.CASCADE,
-        related_name="elections"
+        related_name='elections'
     )
-    eligibility_type  = models.CharField(
-        max_length=10,
-        choices=ELIGIBILITY_CHOICES,
-        default='open'
-    )
-    # For domain: store "school.edu"
-    # For id_list: store comma-separated IDs "ID001,ID002,ID003"
-    # For open: leave blank
-    eligibility_value = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Domain: e.g. school.edu | ID List: e.g. ID001,ID002,ID003"
-    )
-
-    def __str__(self):
-        return f"{self.title} ({self.status})"
+    emails_sent = models.BooleanField(default=False)  # track if voter emails sent
 
     def sync_status(self):
         now = timezone.now()
@@ -49,98 +31,76 @@ class Election(models.Model):
             new_status = 'active'
         else:
             new_status = 'closed'
+
         if self.status != new_status:
             self.status = new_status
             self.save(update_fields=['status'])
 
-    def is_eligible(self, user):
-        """Check if a user is eligible to vote in this election."""
-        if self.eligibility_type == 'open':
-            return True
-
-        elif self.eligibility_type == 'domain':
-            # Check if user email ends with the specified domain
-            domain = (self.eligibility_value or '').strip()
-            return user.email.endswith(f'@{domain}')
-
-        elif self.eligibility_type == 'id_list':
-            # Check if user voter_id is in the comma-separated list
-            id_list = [
-                vid.strip()
-                for vid in (self.eligibility_value or '').split(',')
-                if vid.strip()
-            ]
-            return user.voter_id in id_list
-
-        return False
+    def __str__(self):
+        return self.title
 
 
-class Candidate(models.Model):
-    STATUS_CHOICES = [
-        ('pending',  'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+class Contest(models.Model):
+
+    METHOD_CHOICES = [
+        ('plurality',     'Traditional (Plurality)'),
+        ('ranked_choice', 'Ranked-Choice Voting'),
     ]
-    user      = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="candidates"
-    )
-    election  = models.ForeignKey(
-        Election,
-        on_delete=models.CASCADE,
-        related_name="candidates"
-    )
-    bio       = models.TextField(blank=True, null=True)
-    photo_url = models.URLField(blank=True)
-    status    = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='pending'
-    )
+
+    election      = models.ForeignKey(Election, on_delete=models.CASCADE, related_name='contests')
+    title         = models.CharField(max_length=200)
+    voting_method = models.CharField(max_length=20, choices=METHOD_CHOICES, default='plurality')
+    seats         = models.PositiveIntegerField(default=1)  # number of winners
+    order         = models.PositiveIntegerField(default=0)  # display order on ballot
 
     class Meta:
-        unique_together = [('user', 'election')]
+        ordering = ['order']
 
     def __str__(self):
-        return f"{self.user.username} - {self.election.title} ({self.status})"
+        return f"{self.election.title} — {self.title}"
 
 
-class VoterParticipation(models.Model):
+class ContestCandidate(models.Model):
+
+    contest     = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='candidates')
+    name        = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    order       = models.PositiveIntegerField(default=0)  # display order on ballot
+
     class Meta:
-        unique_together = [('user', 'election')]
-
-    user     = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="voters"
-    )
-    election = models.ForeignKey(
-        Election,
-        on_delete=models.CASCADE,
-        related_name="participations"
-    )
-    voted_at = models.DateTimeField()
+        ordering = ['order']
 
     def __str__(self):
-        return f"{self.user.username} - ({self.voted_at})"
+        return f"{self.name} ({self.contest.title})"
 
 
-class Votes(models.Model):
-    token     = models.UUIDField(default=uuid.uuid4, editable=False)
-    election  = models.ForeignKey(
-        Election,
-        on_delete=models.CASCADE,
-        related_name="votes"
-    )
-    candidate = models.ForeignKey(
-        Candidate,
-        on_delete=models.CASCADE,
-        related_name="votes"
-    )
-    voted_at  = models.DateTimeField()
+class ElectoralRoll(models.Model):
+
+    election = models.ForeignKey(Election, on_delete=models.CASCADE, related_name='electoral_roll')
+    email    = models.EmailField()
+    token    = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    used     = models.BooleanField(default=False)
+    used_at  = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = [('election', 'email')]
 
     def __str__(self):
-        return str(self.token)
+        return f"{self.email} — {self.election.title} ({'voted' if self.used else 'not voted'})"
+
+
+class Vote(models.Model):
+
+    electoral_roll     = models.ForeignKey(ElectoralRoll, on_delete=models.CASCADE, related_name='votes')
+    contest_candidate  = models.ForeignKey(ContestCandidate, on_delete=models.CASCADE, related_name='votes')
+    rank               = models.PositiveIntegerField(null=True, blank=True)
+    # rank is NULL for plurality votes
+    # rank is 1, 2, 3... for ranked_choice votes
+
+    class Meta:
+        unique_together = [('electoral_roll', 'contest_candidate')]
+
+    def __str__(self):
+        return f"Vote by {self.electoral_roll.email} for {self.contest_candidate.name}"
     
     

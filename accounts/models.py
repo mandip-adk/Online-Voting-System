@@ -1,38 +1,53 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-class CustomUser(AbstractUser):
+
+class CustomUserManager(BaseUserManager):
+
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('role', 'admin')
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     ROLE_CHOICES = [
-        ('voter',     'Voter'),
         ('organizer', 'Organizer'),
         ('admin',     'Admin'),
     ]
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='voter')
 
-    voter_id = models.CharField(
-        max_length=30,
-        unique=True,
-        null=True,
-        blank=False,
-        help_text="Citizenship No. / Student ID / Phone Number"
-    )
+    email             = models.EmailField(unique=True)
+    first_name        = models.CharField(max_length=50)
+    last_name         = models.CharField(max_length=50)
+    role              = models.CharField(max_length=20, choices=ROLE_CHOICES, default='organizer')
+    organization_name = models.CharField(max_length=200, blank=True)
+    country           = models.CharField(max_length=100, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.is_superuser:
-            self.role = 'admin'
-        super().save(*args, **kwargs)
+    is_active  = models.BooleanField(default=True)
+    is_staff   = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.username} ({self.role})"
+    date_joined = models.DateTimeField(auto_now_add=True)
 
+    objects = CustomUserManager()
 
-class ContactMessage(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    subject = models.CharField(max_length=200)
-    message = models.TextField()
-    submitted_at = models.DateTimeField(auto_now_add=True)
+    USERNAME_FIELD  = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     def __str__(self):
-        return f"{self.name} - {self.subject}"
+        return f"{self.email} ({self.role})"
+    
+    

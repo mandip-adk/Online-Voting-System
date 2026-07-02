@@ -1,95 +1,42 @@
 from django.contrib import admin
-from .models import Election, Candidate, VoterParticipation, Votes
-
-
-
-# ELECTION ADMIN
+from .models import Election, Contest, ContestCandidate, ElectoralRoll, Vote
 
 
 @admin.register(Election)
 class ElectionAdmin(admin.ModelAdmin):
 
-    list_display = (
-        'title',
-        'status',
-        'start_date',
-        'end_date',
-        'created_by'
-    )
-
-    list_filter = ('status',)
-
+    list_display = ('title', 'status', 'start_date', 'end_date', 'created_by', 'emails_sent')
+    list_filter  = ('status',)
     search_fields = ('title',)
-
-    ordering = ('-start_date',)
-
-    readonly_fields = ('status',)
+    ordering     = ('-start_date',)
+    readonly_fields = ('status', 'emails_sent')
 
 
+@admin.register(Contest)
+class ContestAdmin(admin.ModelAdmin):
 
-# CANDIDATE ADMIN
-
-@admin.register(Candidate)
-class CandidateAdmin(admin.ModelAdmin):
-
-    list_display = (
-        'user',
-        'election',
-        'status',
-        'bio',
-        'photo_url'
-    )
-
-    list_filter = ('status',)
-
-    search_fields = (
-        'user__username',
-        'election__title'
-    )
-
-    actions = [
-        'approve_candidates',
-        'reject_candidates'
-    ]
-
-    def approve_candidates(self, request, queryset):
-        queryset.update(status='approved')
-
-    approve_candidates.short_description = (
-        "Approve selected candidates"
-    )
-
-    def reject_candidates(self, request, queryset):
-        queryset.update(status='rejected')
-
-    reject_candidates.short_description = (
-        "Reject selected candidates"
-    )
+    list_display  = ('title', 'election', 'voting_method', 'seats', 'order')
+    list_filter   = ('voting_method',)
+    search_fields = ('title', 'election__title')
+    ordering      = ('election', 'order')
 
 
-# VOTER PARTICIPATION ADMIN (READ ONLY)
+@admin.register(ContestCandidate)
+class ContestCandidateAdmin(admin.ModelAdmin):
+
+    list_display  = ('name', 'contest', 'order')
+    search_fields = ('name', 'contest__title')
+    ordering      = ('contest', 'order')
 
 
-@admin.register(VoterParticipation)
-class VoteParticipationAdmin(admin.ModelAdmin):
+@admin.register(ElectoralRoll)
+class ElectoralRollAdmin(admin.ModelAdmin):
 
-    list_display = (
-        'user',
-        'election',
-        'voted_at'
-    )
-
-    list_filter = ('election',)
-
-    search_fields = ('user__username',)
-
-    ordering = ('-voted_at',)
-
-    readonly_fields = (
-        'user',
-        'election',
-        'voted_at'
-    )
+    list_display  = ('email', 'election', 'used', 'used_at')
+    list_filter   = ('used', 'election')
+    search_fields = ('email',)
+    ordering      = ('election', 'email')
+    readonly_fields = ('token', 'used', 'used_at')
 
     def has_add_permission(self, request):
         return False
@@ -101,30 +48,13 @@ class VoteParticipationAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
 
-# VOTES ADMIN (READ ONLY)
-
-
-@admin.register(Votes)
-class VotesAdmin(admin.ModelAdmin):
-
-    list_display = (
-        'token',
-        'election',
-        'candidate',
-        'voted_at'
-    )
-
-    list_filter = ('election',)
-
-    ordering = ('-voted_at',)
-
-    readonly_fields = (
-        'token',
-        'election',
-        'candidate',
-        'voted_at'
-    )
+    list_display  = ('contest_candidate', 'electoral_roll', 'rank')
+    list_filter   = ('contest_candidate__contest__election',)
+    ordering      = ('electoral_roll',)
+    readonly_fields = ('electoral_roll', 'contest_candidate', 'rank')
 
     def has_add_permission(self, request):
         return False
@@ -134,3 +64,5 @@ class VotesAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+    
+    
