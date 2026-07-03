@@ -3,68 +3,47 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 
 
-
-# CUSTOM USER ADMIN
-
-
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
 
     list_display = (
-        'username',
         'email',
-        'voter_id',
+        'first_name',
+        'last_name',
         'role',
+        'organization_name',
+        'country',
         'is_active',
-        'date_joined'
+        'date_joined',
     )
 
-    list_filter = (
-        'role',
-        'is_active'
-    )
+    list_filter = ('role', 'is_active')
 
-    search_fields = (
-        'username',
-        'email',
-        'voter_id'
-    )
+    search_fields = ('email', 'first_name', 'last_name', 'organization_name')
 
     ordering = ('-date_joined',)
 
-    fieldsets = UserAdmin.fieldsets + (
-        ('iVote Info', {
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name')}),
+        ('iVote Info', {'fields': ('role', 'organization_name', 'country')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
             'fields': (
-                'role',
-                'voter_id'
-            )
+                'email', 'first_name', 'last_name',
+                'role', 'organization_name', 'country',
+                'password1', 'password2'
+            ),
         }),
     )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('iVote Info', {
-            'fields': (
-                'role',
-                'voter_id'
-            )
-        }),
-    )
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_superuser:
-            return self.readonly_fields + (
-                'is_superuser',
-                'user_permissions',
-                'groups',
-            )
+            return self.readonly_fields + ('is_superuser', 'user_permissions', 'groups')
         return self.readonly_fields
-
-
-from .models import ContactMessage
-
-@admin.register(ContactMessage)
-class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'subject', 'submitted_at')
-    list_filter = ('submitted_at',)
-    search_fields = ('name', 'email', 'subject', 'message')
-    ordering = ('-submitted_at',)
-    readonly_fields = ('name', 'email', 'subject', 'message', 'submitted_at')
+    
+    

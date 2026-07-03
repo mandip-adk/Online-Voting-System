@@ -21,9 +21,9 @@
       </a>
 
       <div class="auth-left-content">
-        <h2 class="auth-left-title">Join iVOTE today.</h2>
+        <h2 class="auth-left-title">Start running elections today.</h2>
         <p class="auth-left-sub">
-          Register in minutes and be ready to participate in secure, transparent elections from any device.
+          Create your organizer account in minutes. Set up elections, invite voters by email, and get results instantly.
         </p>
 
         <div class="register-steps">
@@ -31,23 +31,23 @@
             <div class="reg-step-num">01</div>
             <div class="reg-step-info">
               <div class="step-title">Fill in your details</div>
-              <div class="step-sub">Name, email, and contact info</div>
+              <div class="step-sub">Name, email, and organization info</div>
             </div>
           </div>
           <div class="reg-step-line"></div>
           <div class="reg-step">
             <div class="reg-step-num">02</div>
             <div class="reg-step-info">
-              <div class="step-title">Verify your identity</div>
-              <div class="step-sub">Submit your unique ID</div>
+              <div class="step-title">Add organization details</div>
+              <div class="step-sub">Organization name and country</div>
             </div>
           </div>
           <div class="reg-step-line"></div>
           <div class="reg-step">
             <div class="reg-step-num">03</div>
             <div class="reg-step-info">
-              <div class="step-title">Choose your role</div>
-              <div class="step-sub">Voter or Organizer</div>
+              <div class="step-title">Add organization details</div>
+              <div class="step-sub">Organization name and country</div>
             </div>
           </div>
           <div class="reg-step-line"></div>
@@ -63,10 +63,10 @@
 
       <div class="auth-preview-card">
         <div class="apc-label">Your Future Dashboard</div>
-        <div class="apc-title">Hello, New User! 👋</div>
+        <div class="apc-title">Hello, Organizer! 👋</div>
         <div class="apc-meta">
           <span class="live-dot"></span>
-          <span>3 elections available to vote in</span>
+          <span>Ready to create your first election</span>
         </div>
       </div>
     </div>
@@ -80,113 +80,86 @@
         </div>
 
         <h1 class="auth-title mt-6">Create your account</h1>
-        <p class="auth-subtitle">Join iVOTE to vote or organize elections.</p>
+        <p class="auth-subtitle">Create your organizer account to run secure elections.</p>
 
         <form method="POST" action="{% url 'register' %}" class="auth-form">
           {% csrf_token %}
 
           <!-- ERRORS -->
           {% if form.errors %}
-          <div style="color:red; margin-bottom:10px;">
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:12px;">
             {% for field in form %}
               {% for error in field.errors %}
-                <p>{{ field.label }}: {{ error }}</p>
+                <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ field.label }}: {{ error }}</p>
               {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
             {% endfor %}
           </div>
           {% endif %}
-
-          <!-- USERNAME -->
-          <div class="form-group mt-4">
-            <label class="form-label">Username</label>
-            <div class="input-wrapper">{{ form.username }}</div>
-          </div>
 
           <!-- FIRST + LAST NAME -->
           <div class="form-row mt-4">
             <div class="form-group">
               <label class="form-label">First name</label>
-              <div class="input-wrapper">{{ form.first_name }}</div>
+              <div class="input-wrapper">
+                <input type="text" name="first_name" class="form-control" placeholder="John" value="{{ form.first_name.value|default:'' }}" required />
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Last name</label>
-              <div class="input-wrapper">{{ form.last_name }}</div>
+              <div class="input-wrapper">
+                <input type="text" name="last_name" class="form-control" placeholder="Doe" value="{{ form.last_name.value|default:'' }}" required />
+              </div>
             </div>
           </div>
 
           <!-- EMAIL -->
           <div class="form-group mt-4">
-            <label class="form-label">Email</label>
-            <div class="input-wrapper">{{ form.email }}</div>
+            <label class="form-label">Email Address</label>
+            <div class="input-wrapper">
+              <input type="email" name="email" class="form-control" placeholder="you@example.com" value="{{ form.email.value|default:'' }}" required />
+            </div>
           </div>
 
-          <!-- UNIQUE ID — NEW -->
-          <div class="form-group mt-4">
-            <label class="form-label">Unique ID</label>
-            <div class="input-wrapper">{{ form.voter_id }}</div>
-            <p style="font-size:0.78rem;color:#6b7280;margin-top:4px;">
-              Citizenship No. / Student ID / Phone Number — each person can only register once.
-            </p>
-          </div>
+          <!-- ROLE: always organizer, hidden field -->
+          <input type="hidden" name="role" value="organizer" />
 
-          <!-- ROLE SELECTION — NEW -->
-          <div class="form-group mt-4">
-            <label class="form-label">I want to join as</label>
-            <div style="display:flex;gap:1rem;margin-top:8px;">
-
-              <label style="
-                flex:1;
-                border:2px solid #e5e7eb;
-                border-radius:10px;
-                padding:12px 16px;
-                cursor:pointer;
-                transition:border-color .2s;
-                display:flex;
-                align-items:flex-start;
-                gap:10px;
-              " id="label-voter">
-                <input type="radio" name="role" value="voter"
-                  style="margin-top:3px;accent-color:var(--primary);"
-                  onclick="highlightRole('voter')" checked>
-                <div>
-                  <div style="font-weight:600;font-size:.9rem;">🗳️ Voter</div>
-                  <div style="font-size:.78rem;color:#6b7280;">Participate and vote in elections</div>
-                </div>
-              </label>
-
-              <label style="
-                flex:1;
-                border:2px solid #e5e7eb;
-                border-radius:10px;
-                padding:12px 16px;
-                cursor:pointer;
-                transition:border-color .2s;
-                display:flex;
-                align-items:flex-start;
-                gap:10px;
-              " id="label-organizer">
-                <input type="radio" name="role" value="organizer"
-                  style="margin-top:3px;accent-color:var(--primary);"
-                  onclick="highlightRole('organizer')">
-                <div>
-                  <div style="font-weight:600;font-size:.9rem;">🏛️ Organizer</div>
-                  <div style="font-size:.78rem;color:#6b7280;">Create and manage elections</div>
-                </div>
-              </label>
-
+          <!-- ORGANIZER FIELDS (show/hide) -->
+          <div id="organizer-fields" style="display:block;">
+            <div class="form-group mt-4">
+              <label class="form-label">Organization Name</label>
+              <div class="input-wrapper">
+                <input type="text" name="organization_name" class="form-control"
+                  placeholder="e.g. Chitwan College of Technology"
+                  value="{{ form.organization_name.value|default:'' }}" />
+              </div>
+            </div>
+            <div class="form-group mt-4">
+              <label class="form-label">Country</label>
+              <div class="input-wrapper">
+                <input type="text" name="country" class="form-control"
+                  placeholder="e.g. Nepal"
+                  value="{{ form.country.value|default:'' }}" />
+              </div>
             </div>
           </div>
 
           <!-- PASSWORD -->
           <div class="form-group mt-4">
             <label class="form-label">Password</label>
-            <div class="input-wrapper">{{ form.password1 }}</div>
+            <div class="input-wrapper">
+              <input type="password" name="password1" class="form-control" placeholder="Create a strong password" required />
+            </div>
           </div>
 
           <!-- CONFIRM PASSWORD -->
           <div class="form-group mt-4">
             <label class="form-label">Confirm password</label>
-            <div class="input-wrapper">{{ form.password2 }}</div>
+            <div class="input-wrapper">
+              <input type="password" name="password2" class="form-control" placeholder="Repeat your password" required />
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-full btn-lg mt-6">
@@ -203,14 +176,7 @@
     </div>
   </div>
 
-  <!-- Role card highlight script -->
-  <script>
-    function highlightRole(role) {
-      document.getElementById('label-voter').style.borderColor     = role === 'voter'     ? 'var(--primary)' : '#e5e7eb';
-      document.getElementById('label-organizer').style.borderColor = role === 'organizer' ? 'var(--primary)' : '#e5e7eb';
-    }
-    // Set voter highlighted by default on page load
-    document.addEventListener('DOMContentLoaded', () => highlightRole('voter'));
-  </script>
+
 
 {% endblock %}
+

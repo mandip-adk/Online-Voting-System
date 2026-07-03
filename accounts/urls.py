@@ -1,15 +1,18 @@
 from django.urls import path
+<<<<<<< HEAD
 from .views import register, login_view, logout_view, home, voter_dashboard, organizer_dashboard, admin_dashboard, contact_us, faqs, settings_view, edit_profile, about_view, privacy_policy_view, terms_of_service_view
 
+=======
+from .views import register, login_view, logout_view, home, organizer_dashboard, admin_dashboard, contact_us,faqs, settings_view, edit_profile,about_view, privacy_policy_view, terms_of_service_view
+>>>>>>> 56948a88a6c2083d18b7b44c25f79d42b29eafe9
 
 urlpatterns = [
-    path('register/',  register,  name='register'),
-    path('login/',   login_view,  name='login'),
-    path('logout/',  logout_view, name='logout'),
-    path('',   home, name='home'),
-    path('voter/dashboard/',  voter_dashboard, name='voter_dashboard'),
-    path('organizer/dashboard/',organizer_dashboard, name='organizer_dashboard'),
-    path('admin-dashboard/',    admin_dashboard, name='admin_dashboard'),
+    path('',                     home,                 name='home'),
+    path('register/',            register,             name='register'),
+    path('login/',               login_view,           name='login'),
+    path('logout/',              logout_view,          name='logout'),
+    path('organizer/dashboard/', organizer_dashboard,  name='organizer_dashboard'),
+    path('admin-dashboard/',     admin_dashboard,      name='admin_dashboard'),
     path('contact/',            contact_us,      name='contact'),
     path('faqs/',               faqs,            name='faqs'),
     path('settings/',           settings_view,   name='settings'),
@@ -17,7 +20,10 @@ urlpatterns = [
     path('about/',              about_view,      name='about'),
     path('privacy-policy/',     privacy_policy_view, name='privacy_policy'),
     path('terms-of-service/',   terms_of_service_view, name='terms_of_service'),
-]
+<<<<<<< HEAD
+=======
 
+>>>>>>> 56948a88a6c2083d18b7b44c25f79d42b29eafe9
+]
 
 

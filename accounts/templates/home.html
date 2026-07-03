@@ -17,12 +17,12 @@
           Online Voting System
         </h1>
         <p class="home-hero-desc">
-          Let's make voting and elections easy for you. This is
-          designed to ensure a secured, transparent, and accessible
-          voting session for everyone.
+          Run secure, transparent elections for your organization.
+          Upload your voter list — each voter gets a private email link.
+          No voter account needed, just one click to vote.
         </p>
         <a href="{% url 'register' %}" class="btn btn-primary btn-lg home-hero-btn">
-          Register as a Voter
+          Get Started Free
         </a>
       </div>
 
@@ -107,19 +107,19 @@
         <span class="step-num">Step 1:</span>
         <h3 class="step-title">SIGN UP</h3>
         <p class="step-desc">Create an account on this system to vote</p>
-        <a href="{% url 'register' %}" class="btn btn-sm step-btn">Register as a Voter</a>
+        <a href="{% url 'register' %}" class="btn btn-sm step-btn">Get Started Free</a>
       </div>
 
       <div class="step-card step-dark">
         <span class="step-num">Step 2:</span>
-        <h3 class="step-title">VOTE</h3>
-        <p class="step-desc">Vote for your preferred candidate</p>
+        <h3 class="step-title">INVITE VOTERS</h3>
+        <p class="step-desc">Upload voter emails — iVote sends each voter a unique secret link automatically</p>
       </div>
 
       <div class="step-card step-dark">
         <span class="step-num">Step 3:</span>
         <h3 class="step-title">VIEW ELECTION RESULTS</h3>
-        <p class="step-desc">View election results of various candidate</p>
+        <p class="step-desc">When voting ends, view detailed results and full participation reports instantly</p>
       </div>
 
     </div>
@@ -166,7 +166,7 @@
             </svg>
           </div>
           <h3 class="home-feature-name">Secured Platform</h3>
-          <p class="home-feature-desc">With our system, your data is secured</p>
+          <p class="home-feature-desc">Votes are stored separately from voter identities — ballot secrecy is guaranteed</p>
         </div>
 
         <div class="home-feature-item">
@@ -180,7 +180,7 @@
             </svg>
           </div>
           <h3 class="home-feature-name">Vote Online</h3>
-          <p class="home-feature-desc">In just few clicks, you can vote your preferred candidates</p>
+          <p class="home-feature-desc">Voters receive a private email link — one click to the ballot, no account needed</p>
         </div>
 
         <div class="home-feature-item">
@@ -201,7 +201,7 @@
             </svg>
           </div>
           <h3 class="home-feature-name">Real Time Results</h3>
-          <p class="home-feature-desc">View real time voting results and scores of each candidates</p>
+          <p class="home-feature-desc">View live participation and instant results when your election closes</p>
         </div>
 
       </div>
@@ -209,4 +209,5 @@
   </section>
 
 {% endblock %}
+
 
