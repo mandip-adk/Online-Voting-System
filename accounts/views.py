@@ -45,9 +45,9 @@ def home(request):
     if request.user.is_authenticated:
         if request.user.role == 'admin' or request.user.is_superuser:
             return redirect('admin_dashboard')
-        else:
-            return redirect('organizer_dashboard')
-    return redirect('login')
+        return redirect('organizer_dashboard')
+    return render(request, 'home.html')
+
 
 
 @login_required
