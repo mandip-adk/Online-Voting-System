@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block head %}
-  <link rel="stylesheet" href="{% static 'css/elections.css' %}">
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,8 +14,9 @@
       <p class="page-subtitle">Browse and participate in ongoing and upcoming elections.</p>
     </div>
     {% if user.role == 'organizer' %}
-  <a href="{% url 'voting:create_election' %}" class="btn btn-primary">+ New Election</a>
-{% endif %}
+      <a href="{% url 'voting:create_election' %}" class="btn btn-primary">+ New Election</a>
+    {% endif %}
+  </div>
 
   <!-- FILTER TABS -->
   <div class="filter-tabs">

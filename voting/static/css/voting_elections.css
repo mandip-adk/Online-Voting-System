@@ -4,6 +4,11 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px 80px;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .page-wrapper-narrow { max-width: 820px; }
 
@@ -151,19 +156,24 @@
 }
 .search-icon {
   position: absolute;
-  left: 14px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
-  width: 16px; height: 16px;
+  width: 18px;
+  height: 18px;
   pointer-events: none;
+  transition: var(--transition);
+}
+.search-box:focus-within .search-icon {
+  color: var(--primary);
 }
 .search-input {
   width: 100%;
-  padding: 11px 16px 11px 42px;
+  padding: 12px 20px 12px 46px;
   border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: .9rem;
+  border-radius: 50px;
+  font-size: .95rem;
   font-family: var(--font-body);
   background: #fff;
   color: var(--text-primary);
@@ -321,14 +331,26 @@
 
 /* ── Empty State ── */
 .empty-state {
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 40px;
+  padding: 60px 40px;
   text-align: center;
   grid-column: 1 / -1;
+  flex: 1;
 }
-.empty-icon { color: var(--text-muted); margin-bottom: 16px; }
+.empty-icon {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-icon svg {
+  width: 56px;
+  height: 56px;
+}
 .empty-title {
   font-family: var(--font-head);
   font-size: 1.2rem;
@@ -444,8 +466,6 @@
   grid-template-columns: 1fr 300px;
   gap: 28px;
   align-items: start;
-}
-.detail-main {}
 .detail-sidebar { display: flex; flex-direction: column; gap: 18px; }
 
 .section-subheader {
@@ -719,7 +739,6 @@
   gap: 16px;
   flex-wrap: wrap;
 }
-.results-header-left {}
 .results-label {
   display: inline-flex;
   align-items: center;
@@ -765,8 +784,6 @@
   gap: 28px;
   align-items: start;
 }
-.results-main {}
-
 /* Winner banner */
 .winner-banner {
   display: flex;
@@ -975,4 +992,5 @@
   .result-row { flex-wrap: wrap; }
   .rr-candidate { width: 100%; }
   .rr-bar-wrap { width: 100%; }
+}
 }
