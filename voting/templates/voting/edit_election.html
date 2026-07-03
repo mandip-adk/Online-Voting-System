@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <div>
+      <p class="dash-greeting">Organizer Panel</p>
+      <h1 class="dash-name">Edit Election</h1>
+    </div>
+    <a href="{% url 'organizer_dashboard' %}" class="btn btn-outline">
+      ← Back to Dashboard
+    </a>
+  </div>
+
+  <div style="max-width:680px;margin:0 auto;">
+    <form method="POST" class="auth-form">
+      {% csrf_token %}
+
+      {% if form.errors %}
+      <div style="color:red;margin-bottom:1rem;">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <p>{{ field.label }}: {{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- TITLE -->
+      <div class="form-group mt-4">
+        <label class="form-label">Election Title</label>
+        <div class="input-wrapper">{{ form.title }}</div>
+      </div>
+
+      <!-- DATES -->
+      <div class="form-row mt-4">
+        <div class="form-group">
+          <label class="form-label">Start Date & Time</label>
+          <div class="input-wrapper">{{ form.start_date }}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date & Time</label>
+          <div class="input-wrapper">{{ form.end_date }}</div>
+        </div>
+      </div>
+
+      <!-- ELIGIBILITY TYPE -->
+      <div class="form-group mt-4">
+        <label class="form-label">Who Can Vote?</label>
+        <div style="display:flex;gap:1rem;margin-top:8px;flex-wrap:wrap;">
+
+          <label style="flex:1;min-width:140px;border:2px solid #e5e7eb;border-radius:10px;
+                        padding:12px 16px;cursor:pointer;transition:border-color .2s;
+                        display:flex;align-items:flex-start;gap:10px;" id="label-open">
+            <input type="radio" name="eligibility_type" value="open"
+              style="margin-top:3px;accent-color:var(--primary);"
+              onclick="handleEligibility('open')"
+              {% if form.instance.eligibility_type == 'open' %}checked{% endif %}>
+            <div>
+              <div style="font-weight:600;font-size:.9rem;">🌐 Open</div>
+              <div style="font-size:.75rem;color:#6b7280;">Anyone registered</div>
+            </div>
+          </label>
+
+          <label style="flex:1;min-width:140px;border:2px solid #e5e7eb;border-radius:10px;
+                        padding:12px 16px;cursor:pointer;transition:border-color .2s;
+                        display:flex;align-items:flex-start;gap:10px;" id="label-domain">
+            <input type="radio" name="eligibility_type" value="domain"
+              style="margin-top:3px;accent-color:var(--primary);"
+              onclick="handleEligibility('domain')"
+              {% if form.instance.eligibility_type == 'domain' %}checked{% endif %}>
+            <div>
+              <div style="font-weight:600;font-size:.9rem;">📧 Email Domain</div>
+              <div style="font-size:.75rem;color:#6b7280;">e.g. school.edu only</div>
+            </div>
+          </label>
+
+          <label style="flex:1;min-width:140px;border:2px solid #e5e7eb;border-radius:10px;
+                        padding:12px 16px;cursor:pointer;transition:border-color .2s;
+                        display:flex;align-items:flex-start;gap:10px;" id="label-id_list">
+            <input type="radio" name="eligibility_type" value="id_list"
+              style="margin-top:3px;accent-color:var(--primary);"
+              onclick="handleEligibility('id_list')"
+              {% if form.instance.eligibility_type == 'id_list' %}checked{% endif %}>
+            <div>
+              <div style="font-weight:600;font-size:.9rem;">🪪 ID List</div>
+              <div style="font-size:.75rem;color:#6b7280;">Specific voter IDs only</div>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- ELIGIBILITY VALUE -->
+      <div class="form-group mt-4" id="eligibility-value-group"
+           style="display:{% if form.instance.eligibility_type != 'open' %}block{% else %}none{% endif %};">
+        <label class="form-label" id="eligibility-value-label">Value</label>
+        <div class="input-wrapper">{{ form.eligibility_value }}</div>
+        <p id="eligibility-hint" style="font-size:.78rem;color:#6b7280;margin-top:4px;"></p>
+      </div>
+
+      <div style="display:flex;gap:1rem;margin-top:2rem;">
+        <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">
+          💾 Save Changes
+        </button>
+        <a href="{% url 'organizer_dashboard' %}" class="btn btn-outline btn-lg">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</main>
+
+<script>
+  function handleEligibility(type) {
+    ['open','domain','id_list'].forEach(t => {
+      document.getElementById('label-' + t).style.borderColor =
+        t === type ? 'var(--primary)' : '#e5e7eb';
+    });
+    const group = document.getElementById('eligibility-value-group');
+    const label = document.getElementById('eligibility-value-label');
+    const hint  = document.getElementById('eligibility-hint');
+    if (type === 'open') {
+      group.style.display = 'none';
+    } else if (type === 'domain') {
+      group.style.display = 'block';
+      label.textContent   = 'Allowed Email Domain';
+      hint.textContent    = 'Example: school.edu';
+    } else {
+      group.style.display = 'block';
+      label.textContent   = 'Eligible Voter IDs';
+      hint.textContent    = 'Comma-separated. Example: ID001,ID002,ID003';
+    }
+  }
+  // Set correct highlight on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const checked = document.querySelector('input[name="eligibility_type"]:checked');
+    if (checked) handleEligibility(checked.value);
+  });
+</script>
+{% endblock %}
+

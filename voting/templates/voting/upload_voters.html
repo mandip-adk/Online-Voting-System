@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Upload Eligible Voters</h2>
+    <p class="text-muted">Election: <strong>{{ election.title }}</strong></p>
+
+    <div class="alert alert-info">
+        CSV format: one <strong>voter ID per row</strong>, no header needed.<br>
+        Example:<br>
+        <code>ID001<br>ID002<br>ID003</code>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.csv_file.label_tag }}
+            {{ form.csv_file }}
+            <small class="text-muted">{{ form.csv_file.help_text }}</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+        <a href="{% url 'election_detail' election.id %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

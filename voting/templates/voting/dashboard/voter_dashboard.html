@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — iVOTE</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+  <link rel="stylesheet" href="{% static 'css/voter_dashboard.css' %}"/>
+</head>
+<body class="vd-body">
+
+<div class="vd-layout">
+
+  <!-- ══════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════ -->
+  <aside class="vd-sidebar">
+
+    <!-- Brand -->
+    <a href="{% url 'home' %}" class="vd-brand">
+      <div class="vd-brand-logo"><span>i</span>V</div>
+      <span class="vd-brand-text"><em>i</em>VOTE</span>
+    </a>
+
+    <!-- Avatar -->
+    <a href="{% url 'edit_profile' %}" class="vd-profile">
+      <div class="vd-avatar">
+        {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+      </div>
+      <h3 class="vd-profile-name">{{ user.get_full_name|default:user.username }}</h3>
+      <span class="vd-profile-link">View Profile &rsaquo;</span>
+    </a>
+
+    <!-- Nav -->
+    <nav class="vd-nav">
+      <a href="{% url 'voter_dashboard' %}" class="vd-nav-item active">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="{% url 'voting:elections' %}" class="vd-nav-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Vote
+      </a>
+      <a href="{% url 'faqs' %}" class="vd-nav-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        Voters Guideline
+      </a>
+      <a href="{% url 'settings' %}" class="vd-nav-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        Settings
+      </a>
+    </nav>
+
+    <!-- Logout -->
+    <a href="{% url 'logout' %}" class="vd-logout">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+      </svg>
+      Log out
+    </a>
+
+  </aside>
+
+  <!-- ══════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════ -->
+  <div class="vd-main">
+
+    <!-- Top bar -->
+    <header class="vd-topbar">
+      <div class="vd-search-wrap">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="vd-search-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" class="vd-search" placeholder="Search"/>
+      </div>
+      <div class="vd-topbar-right">
+        <button class="vd-icon-btn" title="Notifications">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          {% if pending_count %}<span class="vd-notif-dot"></span>{% endif %}
+        </button>
+        <button class="vd-icon-btn" title="Help">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3m.08 4h.01"/>
+          </svg>
+        </button>
+        <div class="vd-topbar-user">
+          <div class="vd-top-avatar">{{ user.first_name|slice:":1" }}</div>
+          <span>{{ user.first_name|default:user.username }}</span>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page body -->
+    <div class="vd-content">
+
+      <!-- Greeting -->
+      <div class="vd-greeting">
+        <h1>Hello, <strong>{{ user.first_name|default:user.username }}!</strong></h1>
+        <p>Welcome to iVOTE's Online Voting System</p>
+      </div>
+
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="vd-alert vd-alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- ── MAIN GRID ── -->
+      <div class="vd-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="vd-col-left">
+
+          <!-- Ongoing Election Card -->
+          {% with active_election=None %}
+          {% for item in election_with_status %}
+            {% if item.election.status == 'active' and not item.has_voted %}
+              {% if forloop.first %}
+              <div class="vd-card vd-ongoing-card">
+                <div class="vd-card-label">Ongoing Elections</div>
+                <div class="vd-ongoing-inner">
+                  <div class="vd-ongoing-info">
+                    <h2 class="vd-ongoing-title">{{ item.election.title }}</h2>
+                    <a href="{% url 'voting:vote' item.election.pk %}" class="btn vd-vote-btn">Vote now</a>
+                  </div>
+                  <div class="vd-ongoing-visual">
+                    <svg viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg" width="140">
+                      <!-- Phone/tablet -->
+                      <rect x="42" y="10" width="70" height="100" rx="10" fill="#E8EAFF" stroke="#3A4FD7" stroke-width="1.5"/>
+                      <rect x="50" y="22" width="54" height="38" rx="4" fill="#fff"/>
+                      <rect x="54" y="27" width="28" height="5" rx="2.5" fill="#C7CCF5"/>
+                      <rect x="54" y="35" width="20" height="4" rx="2" fill="#E0E3FF"/>
+                      <rect x="54" y="42" width="24" height="4" rx="2" fill="#E0E3FF"/>
+                      <!-- Vote button on screen -->
+                      <rect x="50" y="66" width="54" height="18" rx="9" fill="#3A4FD7"/>
+                      <text x="77" y="79" text-anchor="middle" fill="#fff" font-size="8" font-family="sans-serif" font-weight="700">VOTE</text>
+                      <!-- Ballot flying out -->
+                      <rect x="88" y="0" width="32" height="24" rx="4" fill="#FFD166" stroke="#F5A623" stroke-width="1.2"/>
+                      <polyline points="88,0 104,14 120,0" fill="none" stroke="#F5A623" stroke-width="1.2"/>
+                      <!-- Girl figure -->
+                      <circle cx="26" cy="42" r="10" fill="#FFBE9D"/>
+                      <ellipse cx="26" cy="35" rx="11" ry="7" fill="#3A4FD7"/>
+                      <rect x="16" y="52" width="20" height="32" rx="8" fill="#E84393"/>
+                      <rect x="4"  y="60" width="14" height="8" rx="4" fill="#FFBE9D"/>
+                      <rect x="36" y="60" width="12" height="8" rx="4" fill="#FFBE9D"/>
+                      <rect x="18" y="84" width="8"  height="22" rx="4" fill="#2B2B5E"/>
+                      <rect x="28" y="84" width="8"  height="22" rx="4" fill="#2B2B5E"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          <!-- No active elections fallback -->
+          {% with has_active=False %}
+          {% for item in election_with_status %}{% if item.election.status == 'active' and not item.has_voted %}{% if forloop.first %}{% endif %}{% endif %}{% endfor %}
+          {% endwith %}
+          {% endwith %}
+
+          <!-- Live Results -->
+          {% for item in election_with_status %}
+            {% if item.election.status == 'active' %}
+              {% if forloop.first %}
+              <div class="vd-card vd-results-card">
+                <div class="vd-card-label">Live Results</div>
+                <h3 class="vd-results-title">{{ item.election.title }}</h3>
+                <div class="vd-results-bars">
+                  {% for candidate in item.election.candidates.all %}
+                    {% if candidate.status == 'approved' %}
+                    <div class="vd-bar-row">
+                      <span class="vd-bar-name">{{ candidate.user.get_full_name|default:candidate.user.username|truncatechars:18 }}</span>
+                      <div class="vd-bar-track">
+                        <div class="vd-bar-fill" style="width:{{ candidate.vote_percentage|default:0 }}%;"></div>
+                      </div>
+                      <span class="vd-bar-pct">{{ candidate.vote_percentage|default:0 }}%</span>
+                    </div>
+                    {% endif %}
+                  {% empty %}
+                    <p class="vd-no-data">No approved candidates yet.</p>
+                  {% endfor %}
+                </div>
+                <p class="vd-results-note">*the candidate list is not in order</p>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          <!-- Election Activities -->
+          <div class="vd-card">
+            <div class="vd-card-label">Election Activities</div>
+            <div class="vd-activity-legend">
+              <span><span class="vd-dot vd-dot-active"></span> Ongoing</span>
+              <span><span class="vd-dot vd-dot-pending"></span> Pending</span>
+              <span><span class="vd-dot vd-dot-closed"></span> Concluded</span>
+            </div>
+            <div class="vd-activity-list">
+              {% for item in election_with_status %}
+              <div class="vd-activity-row">
+                <span class="vd-activity-name">{{ item.election.title|truncatechars:32 }}</span>
+                <span class="vd-dot
+                  {% if item.election.status == 'active' %}vd-dot-active
+                  {% elif item.election.status == 'pending' %}vd-dot-pending
+                  {% else %}vd-dot-closed{% endif %}">
+                </span>
+                <span class="vd-activity-date">
+                  {% if item.election.status == 'active' %}
+                    {{ item.election.end_date|date:"m/d/Y" }}
+                  {% elif item.election.status == 'pending' %}
+                    Pending
+                  {% else %}
+                    Concluded
+                  {% endif %}
+                </span>
+              </div>
+              {% empty %}
+                <p class="vd-no-data">No elections assigned.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="vd-col-right">
+
+          <!-- Calendar card -->
+          <div class="vd-card vd-calendar-card">
+            <div class="vd-card-label">Calendar</div>
+            <div class="vd-cal-tabs">
+              <span class="vd-cal-tab active">Today</span>
+              <span class="vd-cal-tab">Next week</span>
+              <span class="vd-cal-tab">This Month</span>
+            </div>
+            <div class="vd-cal-times">
+              <span>7:00</span><span>8:00</span><span>9:00</span><span>10:00</span><span>11:00</span>
+            </div>
+            <div class="vd-cal-events">
+              {% for item in election_with_status %}
+                {% if item.election.status == 'active' %}
+                <div class="vd-cal-event-row">
+                  <span class="vd-cal-date">
+                    <strong>{{ item.election.end_date|date:"M" }}</strong><br>
+                    {{ item.election.end_date|date:"d" }}
+                  </span>
+                  <span class="vd-cal-event-pill">{{ item.election.title|truncatechars:22 }}</span>
+                </div>
+                {% endif %}
+              {% empty %}
+                <p class="vd-no-data" style="margin-top:10px;">No active elections.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Voting Process (stats) -->
+          <div class="vd-card vd-process-card">
+            <div class="vd-card-label">Voting Process</div>
+
+            <div class="vd-process-item">
+              <div class="vd-ring-wrap">
+                <svg viewBox="0 0 80 80" width="80" height="80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#E8EAFF" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#2B3DB8" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="20"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                  <text x="40" y="45" text-anchor="middle" fill="#2B3DB8" font-size="14" font-weight="800" font-family="sans-serif">{{ election_with_status|length }}</text>
+                </svg>
+              </div>
+              <p class="vd-process-label">Total number of<br>registered voters</p>
+            </div>
+
+            <div class="vd-process-item">
+              <div class="vd-ring-wrap">
+                <svg viewBox="0 0 80 80" width="80" height="80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#E8EAFF" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#2B3DB8" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="50"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                  <text x="40" y="45" text-anchor="middle" fill="#2B3DB8" font-size="14" font-weight="800" font-family="sans-serif">{{ voted_count }}</text>
+                </svg>
+              </div>
+              <p class="vd-process-label">Total number<br>of votes</p>
+            </div>
+
+            <div class="vd-process-item">
+              <div class="vd-ring-wrap">
+                <svg viewBox="0 0 80 80" width="80" height="80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#E8EAFF" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#C7CCF5" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="180"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                  <text x="40" y="45" text-anchor="middle" fill="#2B3DB8" font-size="14" font-weight="800" font-family="sans-serif">{{ my_candidacies|length }}</text>
+                </svg>
+              </div>
+              <p class="vd-process-label">Total number of<br>registered candidates</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+      <!-- end grid -->
+
+    </div>
+    <!-- end vd-content -->
+  </div>
+  <!-- end vd-main -->
+
+</div>
+<!-- end vd-layout -->
+
+</body>
+</html>
+

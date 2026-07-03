@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service — iVOTE{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/contact_faqs.css' %}" />
+<style>
+  .terms-content-wrap {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+  .terms-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    padding: 50px 40px;
+    transition: var(--transition);
+  }
+  .terms-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .terms-section {
+    margin-bottom: 45px;
+  }
+  .terms-section:last-child {
+    margin-bottom: 0;
+  }
+  .terms-section h2 {
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid rgba(58, 79, 215, 0.08);
+    padding-bottom: 10px;
+  }
+  .terms-section h2 svg {
+    color: var(--primary);
+  }
+  .terms-section p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .terms-section ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+  .terms-section li {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .terms-section p:last-child {
+    margin-bottom: 0;
+  }
+  .last-updated {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: -10px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1 class="page-title">Terms of Service</h1>
+    <p class="page-subtitle">
+      The guidelines, rules, and conditions for utilizing the iVOTE online election platform.
+    </p>
+  </header>
+  
+  <p class="last-updated">Last Updated: June 29, 2026</p>
+
+  <!-- Main Content Wrap -->
+  <div class="terms-content-wrap">
+    
+    <!-- Single terms card containing all sections -->
+    <div class="terms-card">
+      
+      <!-- Section 1: Agreement to Terms -->
+      <section class="terms-section">
+        <h2>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          1. Agreement to Terms
+        </h2>
+        <p>
+          By accessing and using the iVOTE online voting system, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, you are prohibited from utilizing the platform.
+        </p>
+      </section>
+
+      <!-- Section 2: User Conduct -->
+      <section class="terms-section">
+        <h2>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+          </svg>
+          2. User Registration & Conduct
+        </h2>
+        <p>
+          To ensure secure elections, all users must maintain the integrity of their credentials:
+        </p>
+        <ul>
+          <li><strong>Authenticity:</strong> You must register using authentic credentials (email, name, unique identifier).</li>
+          <li><strong>Unauthorized Actions:</strong> You may not attempt to vote multiple times in the same election, register using multiple accounts, or bypass voter eligibility filters.</li>
+          <li><strong>System Abuse:</strong> Any attempts to perform SQL injection, cross-site scripting (XSS), token manipulation, or brute-force attacks on the voting ledger will result in immediate termination of access and potential legal action.</li>
+        </ul>
+      </section>
+
+      <!-- Section 3: Election Integrity -->
+      <section class="terms-section">
+        <h2>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          3. Election Integrity
+        </h2>
+        <p>
+          iVOTE strives to guarantee maximum accuracy and transparency:
+        </p>
+        <ul>
+          <li><strong>Audit Capabilities:</strong> Organizers and verified candidates are eligible to submit Audit Requests. The audits scan token hashes against voter logs to verify authenticity.</li>
+          <li><strong>Limitation of Liability:</strong> While we employ best-in-class security measures, iVOTE is not liable for data access delays or interruptions caused by external factors such as local internet failures or third-party email system failures.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Contact Us -->
+      <section class="terms-section">
+        <h2>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          Contact Our Legal Team
+        </h2>
+        <p>
+          If you have any questions or concerns regarding these terms, please contact us via email at <a href="mailto:legal@ivote.com" style="color: var(--primary); text-decoration: underline;">legal@ivote.com</a> or visit our <a href="{% url 'contact' %}" style="color: var(--primary); text-decoration: underline;">Contact Us</a> page.
+        </p>
+      </section>
+      
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
