@@ -24,7 +24,7 @@
       <div class="auth-left-content">
         <h2 class="auth-left-title">Welcome back!</h2>
         <p class="auth-left-sub">
-          Sign in to access your voter dashboard, cast your vote, and monitor live election results in real time.
+          Sign in to access your organizer dashboard and manage your elections.
         </p>
         <div class="auth-left-steps">
           <div class="auth-step">
@@ -34,8 +34,8 @@
               </svg>
             </div>
             <div>
-              <div class="step-title">Verified Identity</div>
-              <div class="step-sub">Your account is secured and verified</div>
+              <div class="step-title">Secure Access</div>
+              <div class="step-sub">Your organizer account is secured and verified</div>
             </div>
           </div>
           <div class="auth-step">
@@ -45,8 +45,8 @@
               </svg>
             </div>
             <div>
-              <div class="step-title">Cast Your Vote</div>
-              <div class="step-sub">One vote per eligible voter, guaranteed</div>
+              <div class="step-title">Manage Elections</div>
+              <div class="step-sub">Create contests, invite voters, track results</div>
             </div>
           </div>
           <div class="auth-step">
@@ -57,7 +57,7 @@
             </div>
             <div>
               <div class="step-title">Live Results</div>
-              <div class="step-sub">Track election outcomes in real time</div>
+              <div class="step-sub">View participation and results in real time</div>
             </div>
           </div>
         </div>
@@ -74,8 +74,8 @@
           <div class="brand-logo" style="width:44px;height:44px;background:var(--primary);color:#fff;border:none;font-size:1.1rem;"><span>i</span>V</div>
         </div>
  
-        <h1 class="auth-title">Sign In</h1>
-        <p class="auth-subtitle">Enter your credentials to access your voter account.</p>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Enter your email and password to access your account.</p>
  
     <form method="POST" action="{% url 'login' %}" class="auth-form">
         {% csrf_token %}
@@ -88,16 +88,16 @@
 {% endif %}
   
   <div class="form-group mt-4">
-    <label class="form-label">Username</label>
+    <label class="form-label">Email Address</label>
     <div class="input-wrapper">
-      {{ form.username }}
+      <input type="email" name="username" class="form-control" placeholder="you@example.com" required autofocus />
     </div>
   </div>
 
   <div class="form-group mt-4">
     <label class="form-label">Password</label>
     <div class="input-wrapper">
-      {{ form.password }}
+      <input type="password" name="password" class="form-control" placeholder="Enter your password" required />
     </div>
   </div>
 
@@ -108,9 +108,10 @@
 
    <p class="auth-switch mt-6 text-center">
           Don't have an account?
-          <a href="{% url 'register' %}" class="auth-switch-link">Register here</a>
+          <a href="{% url 'register' %}" class="auth-switch-link">Create one here</a>
         </p>
     </div>
     </div>
     </div>
 {% endblock %}
+
