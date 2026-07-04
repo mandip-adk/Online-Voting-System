@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper page-wrapper-narrow">
+
+  <div class="breadcrumb">
+    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a> /
+    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a> /
+    <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a> /
+    <span class="bc-current">Send Emails</span>
+  </div>
+
+  <div class="auth-form" style="max-width:600px;margin:0 auto;">
+    <h1 style="font-size:1.4rem;font-weight:700;margin-bottom:.25rem;">Send Voting Emails</h1>
+    <p style="color:#6b7280;font-size:.9rem;margin-bottom:1.5rem;">
+      {{ election.title }} — {{ roll.count }} voter{{ roll.count|pluralize }} in the electoral roll.
+    </p>
+
+    {% if not roll %}
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+        <p style="color:#DC2626;font-size:.85rem;margin:0;">
+          The electoral roll is empty. Upload voters before sending emails.
+        </p>
+      </div>
+    {% else %}
+      <div class="vote-notice" style="margin-bottom:1.5rem;">
+        This will send a unique voting link to each voter. This action cannot be undone.
+      </div>
+
+      <div class="sidebar-widget" style="margin-bottom:1.5rem;">
+        <div class="sw-title">Preview</div>
+        <div class="info-rows">
+          {% for entry in roll|slice:":5" %}
+            <div class="info-row">
+              <span class="ir-label">{{ entry.email }}</span>
+            </div>
+          {% endfor %}
+          {% if roll.count > 5 %}
+            <div class="info-row">
+              <span class="ir-label" style="color:#6b7280;">...and {{ roll.count|add:"-5" }} more</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div style="display:flex;gap:1rem;">
+        <a href="{% url 'voting:election_detail' election.pk %}" class="btn btn-outline btn-lg" style="flex:1;">Cancel</a>
+        <button type="submit" class="btn btn-lg" style="flex:1;background:#DC2626;color:white;border:none;"
+                {% if not roll %}disabled{% endif %}>
+          📧 Send Emails to {{ roll.count }} Voter{{ roll.count|pluralize }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+</main>
+{% endblock %}
+

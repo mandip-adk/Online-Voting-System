@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <div class="breadcrumb">
+    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a> /
+    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a> /
+    <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a> /
+    <span class="bc-current">Participation</span>
+  </div>
+
+  <div class="form-row" style="gap:1rem;margin-bottom:1.5rem;">
+    <div class="sidebar-widget" style="flex:1;text-align:center;">
+      <div class="sw-title">Invited</div>
+      <div style="font-size:1.6rem;font-weight:700;">{{ total }}</div>
+    </div>
+    <div class="sidebar-widget" style="flex:1;text-align:center;">
+      <div class="sw-title">Voted</div>
+      <div style="font-size:1.6rem;font-weight:700;color:#16A34A;">{{ voted }}</div>
+    </div>
+    <div class="sidebar-widget" style="flex:1;text-align:center;">
+      <div class="sw-title">Not Voted</div>
+      <div style="font-size:1.6rem;font-weight:700;color:#DC2626;">{{ not_voted }}</div>
+    </div>
+    <div class="sidebar-widget" style="flex:1;text-align:center;">
+      <div class="sw-title">Turnout</div>
+      <div style="font-size:1.6rem;font-weight:700;">{{ turnout }}%</div>
+    </div>
+  </div>
+
+  {% if roll %}
+  <div class="sidebar-widget">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid #e5e7eb;">
+          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Email</th>
+          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Status</th>
+          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Voted At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in roll %}
+        <tr style="border-bottom:1px solid #f3f4f6;">
+          <td style="padding:10px;font-size:.85rem;">{{ entry.email }}</td>
+          <td style="padding:10px;">
+            {% if entry.used %}
+              <span class="ec-status-badge badge-active" style="padding:2px 10px;font-size:.72rem;">✓ Voted</span>
+            {% else %}
+              <span class="ec-status-badge badge-closed" style="padding:2px 10px;font-size:.72rem;">✗ Not Voted</span>
+            {% endif %}
+          </td>
+          <td style="padding:10px;font-size:.85rem;color:#6b7280;">
+            {{ entry.used_at|default:"—" }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🗳️</div>
+    <div class="empty-title">No voters invited yet</div>
+    <div class="empty-sub">
+      <a href="{% url 'voting:upload_electoral_roll' election.pk %}" class="btn btn-primary btn-sm">Upload Electoral Roll</a>
+    </div>
+  </div>
+  {% endif %}
+
+</main>
+{% endblock %}
+

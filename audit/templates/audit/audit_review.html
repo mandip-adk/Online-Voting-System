@@ -55,28 +55,6 @@
     <!-- LEFT: REQUEST DETAILS -->
     <div class="audit-detail-col">
 
-      <!-- Candidate Card -->
-      <div class="sidebar-widget">
-        <h3 class="sw-title">Candidate</h3>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div class="rr-avatar" style="width:48px;height:48px;font-size:.9rem;flex-shrink:0;">
-            {{ audit_request.candidate.user.first_name|slice:":1" }}{{ audit_request.candidate.user.last_name|slice:":1" }}
-          </div>
-          <div>
-            <div class="at-title" style="font-size:1rem;">
-              {{ audit_request.candidate.user.get_full_name|default:audit_request.candidate.user.username }}
-            </div>
-            <div class="at-sub">@{{ audit_request.candidate.user.username }}</div>
-            <div class="at-sub" style="margin-top:2px;">
-              {{ audit_request.candidate.user.email }}
-            </div>
-            <div class="at-sub" style="margin-top:2px;">
-              ID: {{ audit_request.candidate.user.voter_id }}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Election Card -->
       <div class="sidebar-widget">
         <h3 class="sw-title">Election</h3>
@@ -105,11 +83,11 @@
           </div>
           <div class="info-row">
             <span class="ir-label">Total Votes</span>
-            <span class="ir-value">{{ audit_request.election.votes.count }}</span>
+            <span class="ir-value">{{ total_votes }}</span>
           </div>
           <div class="info-row">
-            <span class="ir-label">Candidates</span>
-            <span class="ir-value">{{ audit_request.election.candidates.count }}</span>
+            <span class="ir-label">Contests</span>
+            <span class="ir-value">{{ total_contests }}</span>
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:16px;">
@@ -117,7 +95,7 @@
              class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;">
             View Election
           </a>
-          <a href="{% url 'voting:result' audit_request.election.pk %}"
+          <a href="{% url 'voting:election_results' audit_request.election.pk %}"
              class="btn btn-outline btn-sm" style="flex:1;justify-content:center;">
             Results
           </a>
@@ -245,7 +223,7 @@
               {% endfor %}
             {% endif %}
             <span class="field-help">
-              Required when approving or rejecting. This will be visible to the candidate.
+              Required when approving or rejecting. This will be visible to the organizer.
             </span>
           </div>
 
@@ -277,4 +255,5 @@
 
 </main>
 {% endblock %}
+
 

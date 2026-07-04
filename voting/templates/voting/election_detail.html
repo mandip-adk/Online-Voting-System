@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="bc-current">{{ election.title }}</span>
+  </div>
+
+  <!-- ELECTION HERO BANNER -->
+  <div class="detail-hero">
+    <div class="detail-hero-left">
+
+      <div class="detail-status-badge badge-{{ election.status }}">
+        <span class="status-dot dot-{{ election.status }}"></span>
+        {{ election.get_status_display }}
+      </div>
+
+      <h1 class="detail-title">{{ election.title }}</h1>
+
+      {% if election.description %}
+        <p style="color:var(--text-muted);font-size:.95rem;margin:8px 0 14px;line-height:1.6;">
+          {{ election.description }}
+        </p>
+      {% endif %}
+
+      <div class="detail-date-row">
+        <div class="detail-date-box">
+          <span class="ddb-label">Start Date</span>
+          <span class="ddb-value">{{ election.start_date|date:"F d, Y · g:i A" }}</span>
+        </div>
+        <div class="detail-date-arrow">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </div>
+        <div class="detail-date-box">
+          <span class="ddb-label">End Date</span>
+          <span class="ddb-value">{{ election.end_date|date:"F d, Y · g:i A" }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STATS COLUMN -->
+    <div class="detail-hero-stats">
+      <div class="dhs-card">
+        <div class="dhs-num">{{ contests|length }}</div>
+        <div class="dhs-label">Contests</div>
+      </div>
+      <div class="dhs-card">
+        <div class="dhs-num">{{ total }}</div>
+        <div class="dhs-label">Voters Invited</div>
+      </div>
+      <div class="dhs-card">
+        <div class="dhs-num">{{ voted }}</div>
+        <div class="dhs-label">Votes Cast</div>
+      </div>
+      <div class="dhs-card dhs-highlight">
+        <div class="dhs-num">{{ turnout }}%</div>
+        <div class="dhs-label">Turnout</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIZER ACTION BANNER -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="voter-banner banner-{% if message.tags == 'success' %}voted{% elif message.tags == 'error' %}closed{% else %}pending{% endif %}" style="margin-bottom:16px;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- QUICK ACTIONS BAR -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;">
+    {% if election.status == 'pending' %}
+      <a href="{% url 'voting:edit_election' election.pk %}" class="btn btn-outline btn-sm">
+        ✏️ Edit Election
+      </a>
+      <a href="{% url 'voting:delete_election' election.pk %}" class="btn btn-sm"
+         style="color:#DC2626;border:1px solid #DC2626;border-radius:8px;padding:6px 14px;">
+        🗑️ Delete
+      </a>
+    {% endif %}
+    <a href="{% url 'voting:upload_electoral_roll' election.pk %}" class="btn btn-outline btn-sm">
+      📋 Manage Voters
+    </a>
+    <a href="{% url 'voting:voter_participation' election.pk %}" class="btn btn-outline btn-sm">
+      👥 Participation
+    </a>
+    {% if not election.emails_sent and total > 0 %}
+      <a href="{% url 'voting:send_voting_emails' election.pk %}" class="btn btn-primary btn-sm">
+        📧 Send Voting Emails
+      </a>
+    {% elif election.emails_sent %}
+      <span class="btn btn-sm" style="background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0;border-radius:8px;padding:6px 14px;cursor:default;">
+        ✓ Emails Sent
+      </span>
+    {% endif %}
+    <a href="{% url 'voting:election_results' election.pk %}" class="btn btn-ghost btn-sm">
+      📊 Results →
+    </a>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="detail-content-grid">
+
+    <!-- MAIN: CONTESTS SECTION -->
+    <section class="detail-main">
+
+      <div class="section-subheader">
+        <h2 class="section-subtitle">Contests</h2>
+        <a href="{% url 'voting:add_contest' election.pk %}" class="btn btn-primary btn-sm">
+          + Add Contest
+        </a>
+      </div>
+
+      {% for contest in contests %}
+      <div class="sidebar-widget" style="margin-bottom:20px;">
+
+        <!-- Contest Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div>
+            <h3 class="sw-title" style="margin-bottom:4px;">{{ contest.title }}</h3>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span style="font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;
+                {% if contest.voting_method == 'ranked_choice' %}
+                  background:rgba(139,92,246,.1);color:#7C3AED;
+                {% else %}
+                  background:rgba(58,79,215,.1);color:var(--primary);
+                {% endif %}">
+                {% if contest.voting_method == 'ranked_choice' %}🔢 Ranked-Choice{% else %}☑️ Plurality{% endif %}
+              </span>
+              <span style="font-size:.78rem;color:var(--text-muted);">
+                {{ contest.seats }} winner{{ contest.seats|pluralize }}
+              </span>
+              <span style="font-size:.78rem;color:var(--text-muted);">
+                · {{ contest.candidates.count }} candidate{{ contest.candidates.count|pluralize }}
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <a href="{% url 'voting:edit_contest' election.pk contest.pk %}"
+               class="btn btn-ghost btn-sm">✏️</a>
+            <a href="{% url 'voting:delete_contest' election.pk contest.pk %}"
+               class="btn btn-sm" style="color:#DC2626;border:1px solid #fecaca;border-radius:8px;padding:4px 10px;">🗑️</a>
+          </div>
+        </div>
+
+        <!-- Candidates list -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          {% for candidate in contest.candidates.all %}
+          <div style="display:flex;justify-content:space-between;align-items:center;
+                      padding:10px 14px;background:var(--bg-light,#F8F7FF);
+                      border-radius:8px;border:1px solid var(--border-light,#E5E7EB);">
+            <div>
+              <span style="font-weight:600;font-size:.9rem;">{{ candidate.name }}</span>
+              {% if candidate.description %}
+                <span style="color:var(--text-muted);font-size:.82rem;margin-left:8px;">
+                  — {{ candidate.description|truncatechars:60 }}
+                </span>
+              {% endif %}
+            </div>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'voting:edit_candidate' election.pk contest.pk candidate.pk %}"
+                 class="btn btn-ghost btn-sm" style="padding:4px 10px;">✏️</a>
+              <a href="{% url 'voting:delete_candidate' election.pk contest.pk candidate.pk %}"
+                 class="btn btn-sm" style="color:#DC2626;border:1px solid #fecaca;border-radius:8px;padding:4px 10px;">🗑️</a>
+            </div>
+          </div>
+          {% empty %}
+          <div style="padding:14px;text-align:center;color:var(--text-muted);font-size:.88rem;">
+            No candidates yet.
+            <a href="{% url 'voting:add_candidate' election.pk contest.pk %}"
+               style="color:var(--primary);font-weight:600;">Add one →</a>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Add candidate link -->
+        <div style="margin-top:12px;">
+          <a href="{% url 'voting:add_candidate' election.pk contest.pk %}"
+             class="btn btn-outline btn-sm">+ Add Candidate</a>
+        </div>
+
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+                 M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No contests yet</h3>
+        <p class="empty-sub">Add a contest to define what voters will vote on.</p>
+        <a href="{% url 'voting:add_contest' election.pk %}" class="btn btn-primary" style="margin-top:1rem;">
+          + Add First Contest
+        </a>
+      </div>
+      {% endfor %}
+
+    </section>
+
+    <!-- SIDEBAR -->
+    <aside class="detail-sidebar">
+
+      <!-- ELECTION INFO -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Election Info</h3>
+        <div class="info-rows">
+          <div class="info-row">
+            <span class="ir-label">Status</span>
+            <span class="ir-value">
+              <span class="ec-status-badge badge-{{ election.status }}" style="padding:2px 10px;font-size:.72rem;display:inline-flex;">
+                <span class="status-dot dot-{{ election.status }}"></span>
+                {{ election.get_status_display }}
+              </span>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Organizer</span>
+            <span class="ir-value">{{ election.created_by.get_full_name|default:election.created_by.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Organization</span>
+            <span class="ir-value">{{ election.created_by.organization_name|default:"—" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Opens</span>
+            <span class="ir-value">{{ election.start_date|date:"M d, Y · g:i A" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Closes</span>
+            <span class="ir-value">{{ election.end_date|date:"M d, Y · g:i A" }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Contests</span>
+            <span class="ir-value">{{ contests|length }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Invited</span>
+            <span class="ir-value">{{ total }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Voted</span>
+            <span class="ir-value">{{ voted }} / {{ total }}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Turnout</span>
+            <span class="ir-value">{{ turnout }}%</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Emails Sent</span>
+            <span class="ir-value">
+              {% if election.emails_sent %}
+                <span style="color:#15803D;font-weight:600;">✓ Yes</span>
+              {% else %}
+                <span style="color:#D97706;">Not yet</span>
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ELECTORAL ROLL WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Electoral Roll</h3>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:14px;">
+          {{ total }} voter{{ total|pluralize }} invited · {{ voted }} voted
+        </p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="{% url 'voting:upload_electoral_roll' election.pk %}" class="btn btn-outline btn-full">
+            📋 Upload / Manage Voters
+          </a>
+          <a href="{% url 'voting:voter_participation' election.pk %}" class="btn btn-ghost btn-full">
+            👥 View Participation
+          </a>
+          {% if not election.emails_sent and total > 0 %}
+          <a href="{% url 'voting:send_voting_emails' election.pk %}" class="btn btn-primary btn-full">
+            📧 Send Voting Emails
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- RESULTS WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Results</h3>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:14px;">
+          View vote counts per contest and candidate.
+        </p>
+        <a href="{% url 'voting:election_results' election.pk %}" class="btn btn-primary btn-full">
+          📊 View Results →
+        </a>
+      </div>
+
+      <!-- AUDIT WIDGET -->
+      <div class="sidebar-widget">
+        <h3 class="sw-title">Audit Requests</h3>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:14px;">
+          Review audit requests submitted for this election.
+        </p>
+        <a href="{% url 'audit:audit_list' %}" class="btn btn-outline btn-full">
+          View Audit Requests →
+        </a>
+      </div>
+
+    </aside>
+  </div>
+
+</main>
+{% endblock %}
+

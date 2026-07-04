@@ -27,97 +27,54 @@
 
       <!-- ERRORS -->
       {% if form.errors %}
-      <div style="color:red;margin-bottom:1rem;">
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;
+                  padding:12px 16px;margin-bottom:16px;">
         {% for field in form %}
           {% for error in field.errors %}
-            <p>{{ field.label }}: {{ error }}</p>
+            <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ field.label }}: {{ error }}</p>
           {% endfor %}
         {% endfor %}
         {% for error in form.non_field_errors %}
-          <p>{{ error }}</p>
+          <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
         {% endfor %}
       </div>
       {% endif %}
 
       <!-- TITLE -->
       <div class="form-group mt-4">
-        <label class="form-label">Election Title</label>
+        <label class="form-label">Election Title <span style="color:#EF4444;">*</span></label>
         <div class="input-wrapper">{{ form.title }}</div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="form-group mt-4">
+        <label class="form-label">Description <span style="color:#6b7280;font-weight:400;">(optional)</span></label>
+        <div class="input-wrapper">{{ form.description }}</div>
       </div>
 
       <!-- DATES -->
       <div class="form-row mt-4">
         <div class="form-group">
-          <label class="form-label">Start Date & Time</label>
+          <label class="form-label">Start Date & Time <span style="color:#EF4444;">*</span></label>
           <div class="input-wrapper">{{ form.start_date }}</div>
         </div>
         <div class="form-group">
-          <label class="form-label">End Date & Time</label>
+          <label class="form-label">End Date & Time <span style="color:#EF4444;">*</span></label>
           <div class="input-wrapper">{{ form.end_date }}</div>
         </div>
       </div>
 
-      <!-- ELIGIBILITY TYPE -->
-      <div class="form-group mt-4">
-        <label class="form-label">Who Can Vote?</label>
-        <div style="display:flex;gap:1rem;margin-top:8px;flex-wrap:wrap;">
-
-          <label style="
-            flex:1;min-width:140px;
-            border:2px solid #e5e7eb;border-radius:10px;
-            padding:12px 16px;cursor:pointer;
-            transition:border-color .2s;
-            display:flex;align-items:flex-start;gap:10px;
-          " id="label-open">
-            <input type="radio" name="eligibility_type" value="open"
-              style="margin-top:3px;accent-color:var(--primary);"
-              onclick="handleEligibility('open')" checked>
-            <div>
-              <div style="font-weight:600;font-size:.9rem;">🌐 Open</div>
-              <div style="font-size:.75rem;color:#6b7280;">Anyone registered</div>
-            </div>
-          </label>
-
-          <label style="
-            flex:1;min-width:140px;
-            border:2px solid #e5e7eb;border-radius:10px;
-            padding:12px 16px;cursor:pointer;
-            transition:border-color .2s;
-            display:flex;align-items:flex-start;gap:10px;
-          " id="label-domain">
-            <input type="radio" name="eligibility_type" value="domain"
-              style="margin-top:3px;accent-color:var(--primary);"
-              onclick="handleEligibility('domain')">
-            <div>
-              <div style="font-weight:600;font-size:.9rem;">📧 Email Domain</div>
-              <div style="font-size:.75rem;color:#6b7280;">e.g. school.edu only</div>
-            </div>
-          </label>
-
-          <label style="
-            flex:1;min-width:140px;
-            border:2px solid #e5e7eb;border-radius:10px;
-            padding:12px 16px;cursor:pointer;
-            transition:border-color .2s;
-            display:flex;align-items:flex-start;gap:10px;
-          " id="label-id_list">
-            <input type="radio" name="eligibility_type" value="id_list"
-              style="margin-top:3px;accent-color:var(--primary);"
-              onclick="handleEligibility('id_list')">
-            <div>
-              <div style="font-weight:600;font-size:.9rem;">🪪 ID List</div>
-              <div style="font-size:.75rem;color:#6b7280;">Specific voter IDs only</div>
-            </div>
-          </label>
-
-        </div>
-      </div>
-
-      <!-- ELIGIBILITY VALUE — shown only for domain or id_list -->
-      <div class="form-group mt-4" id="eligibility-value-group" style="display:none;">
-        <label class="form-label" id="eligibility-value-label">Value</label>
-        <div class="input-wrapper">{{ form.eligibility_value }}</div>
-        <p id="eligibility-hint" style="font-size:.78rem;color:#6b7280;margin-top:4px;"></p>
+      <!-- INFO NOTICE -->
+      <div class="vote-notice" style="margin-top:20px;">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p>
+          After creating the election you can add <strong>contests</strong> and <strong>candidates</strong>,
+          then upload your <strong>voter email list</strong>. Voting invitations are sent automatically
+          when the election becomes active.
+        </p>
       </div>
 
       <!-- SUBMIT -->
@@ -134,34 +91,5 @@
   </div>
 
 </main>
-
-<script>
-  function handleEligibility(type) {
-    // Highlight selected card
-    ['open','domain','id_list'].forEach(t => {
-      document.getElementById('label-' + t).style.borderColor =
-        t === type ? 'var(--primary)' : '#e5e7eb';
-    });
-
-    const group = document.getElementById('eligibility-value-group');
-    const label = document.getElementById('eligibility-value-label');
-    const hint  = document.getElementById('eligibility-hint');
-
-    if (type === 'open') {
-      group.style.display = 'none';
-    } else if (type === 'domain') {
-      group.style.display = 'block';
-      label.textContent   = 'Allowed Email Domain';
-      hint.textContent    = 'Example: school.edu — only users with @school.edu emails can vote.';
-    } else if (type === 'id_list') {
-      group.style.display = 'block';
-      label.textContent   = 'Eligible Voter IDs';
-      hint.textContent    = 'Enter comma-separated IDs. Example: ID001,ID002,ID003';
-    }
-  }
-
-  // Set default highlight on load
-  document.addEventListener('DOMContentLoaded', () => handleEligibility('open'));
-</script>
-
 {% endblock %}
+

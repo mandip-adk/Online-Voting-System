@@ -11,11 +11,9 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Elections</h1>
-      <p class="page-subtitle">Browse and participate in ongoing and upcoming elections.</p>
+      <p class="page-subtitle">Manage your elections, contests, and voter rolls.</p>
     </div>
-    {% if user.role == 'organizer' %}
-      <a href="{% url 'voting:create_election' %}" class="btn btn-primary">+ New Election</a>
-    {% endif %}
+    <a href="{% url 'voting:create_election' %}" class="btn btn-primary">+ New Election</a>
   </div>
 
   <!-- FILTER TABS -->
@@ -61,28 +59,24 @@
         <!-- BODY -->
         <div class="ec-body">
           <h3 class="ec-title">{{ election.title }}</h3>
-          <p class="ec-meta">Created by {{ election.created_by.get_full_name|default:election.created_by.username }}</p>
+          <p class="ec-meta">{{ election.start_date|date:"M d" }} → {{ election.end_date|date:"M d, Y" }}</p>
 
-          <div class="ec-dates">
-            <div class="ec-date-item">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              {{ election.start_date|date:"M d, Y" }}
-            </div>
-            <span class="ec-date-sep">→</span>
-            <div class="ec-date-item">{{ election.end_date|date:"M d, Y" }}</div>
-          </div>
+
 
           <div class="ec-stats">
             <div class="ec-stat">
-              <span class="ec-stat-num">{{ election.candidates.count }}</span>
-              <span class="ec-stat-label">Candidates</span>
+              <span class="ec-stat-num">{{ election.contests.count }}</span>
+              <span class="ec-stat-label">Contests</span>
             </div>
             <div class="ec-stat-divider"></div>
             <div class="ec-stat">
-              <span class="ec-stat-num">{{ election.participations.count }}</span>
-              <span class="ec-stat-label">Votes cast</span>
+              <span class="ec-stat-num">{{ election.voted_count }}</span>
+              <span class="ec-stat-label">Voted</span>
+            </div>
+            <div class="ec-stat-divider"></div>
+            <div class="ec-stat">
+              <span class="ec-stat-num">{{ election.total_count }}</span>
+              <span class="ec-stat-label">Invited</span>
             </div>
           </div>
 
@@ -98,20 +92,17 @@
 
         <!-- FOOTER: BUTTONS BY STATUS -->
         <div class="ec-footer">
-          {% if election.status == 'active' %}
-            <a href="{% url 'voting:election_detail' election.pk %}" class="btn btn-primary btn-sm ec-cta">
-              View &amp; Vote →
-            </a>
-            <a href="{% url 'voting:result' election.pk %}" class="btn btn-ghost btn-sm">Results</a>
-          {% elif election.status == 'pending' %}
-            <a href="{% url 'voting:election_detail' election.pk %}" class="btn btn-outline btn-sm ec-cta">
+          <a href="{% url 'voting:election_detail' election.pk %}" class="btn btn-outline btn-sm ec-cta">
               View Details
             </a>
-          {% else %}
-            <a href="{% url 'voting:result' election.pk %}" class="btn btn-primary btn-sm ec-cta">
-              View Results →
+            <a href="{% url 'voting:election_results' election.pk %}" class="btn btn-ghost btn-sm">
+              Results →
             </a>
-          {% endif %}
+            {% if election.status == 'pending' %}
+            <a href="{% url 'voting:edit_election' election.pk %}" class="btn btn-ghost btn-sm">
+              ✏️ Edit
+            </a>
+            {% endif %}
         </div>
 
       </div>
@@ -124,7 +115,7 @@
           </svg>
         </div>
         <h3 class="empty-title">No elections found</h3>
-        <p class="empty-sub">There are no elections available right now.</p>
+        <p class="empty-sub">Create your first election to get started.</p>
       </div>
     {% endfor %}
   </div>
@@ -160,3 +151,4 @@
   }
 </script>
 {% endblock %}
+

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="page-wrapper">
+
+  <div class="breadcrumb">
+    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a> /
+    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a> /
+    <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a> /
+    <span class="bc-current">Manage Voters</span>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="vote-notice" style="margin-bottom:1rem;">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="detail-content-grid">
+
+    <div class="detail-main">
+
+      <div class="auth-form" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:.25rem;">Upload CSV</h2>
+        <p style="color:#6b7280;font-size:.85rem;margin-bottom:1rem;">
+          One email per row, no header needed.
+        </p>
+        {% if form.errors %}
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+          {% for field in form %}{% for error in field.errors %}
+            <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ field.label }}: {{ error }}</p>
+          {% endfor %}{% endfor %}
+          {% for error in form.non_field_errors %}
+            <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="csv">
+          <div class="form-group">
+            <label class="form-label">CSV File</label>
+            <div class="input-wrapper">{{ form.csv_file }}</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload CSV</button>
+        </form>
+      </div>
+
+      <div class="auth-form">
+        <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:.25rem;">Paste Emails</h2>
+        <p style="color:#6b7280;font-size:.85rem;margin-bottom:1rem;">
+          One email per line or comma-separated.
+        </p>
+        {% if form2.errors %}
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+          {% for field in form2 %}{% for error in field.errors %}
+            <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ field.label }}: {{ error }}</p>
+          {% endfor %}{% endfor %}
+          {% for error in form2.non_field_errors %}
+            <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="emails">
+          <div class="form-group">
+            <label class="form-label">Emails</label>
+            <div class="input-wrapper">{{ form2.emails }}</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Emails</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="detail-sidebar">
+      <div class="sidebar-widget">
+        <div class="sw-title">Electoral Roll ({{ roll.count }})</div>
+        {% if roll %}
+          <div class="info-rows">
+            {% for entry in roll %}
+              <div class="info-row">
+                <span class="ir-label">{{ entry.email }}</span>
+                <span class="ir-value">
+                  {% if entry.used %}✓{% else %}✗{% endif %}
+                </span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No voters yet</div>
+            <div class="empty-sub">Upload a CSV or paste emails to get started.</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</main>
+{% endblock %}
+

@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ballot — {{ election.title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+</head>
+<body style="min-height:100vh;display:flex;align-items:center;justify-content:center;
+             background:#F8F7FF;font-family:'Inter',sans-serif;padding:2rem 1rem;">
+
+  <div style="max-width:640px;width:100%;background:white;border-radius:16px;padding:2.5rem;
+              box-shadow:0 4px 24px rgba(0,0,0,.06);">
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
+      <div style="width:36px;height:36px;background:var(--primary);border-radius:10px 10px 10px 0;
+                  display:flex;align-items:center;justify-content:center;">
+        <span style="color:white;font-weight:900;font-style:italic;font-size:1rem;">i</span>
+      </div>
+      <span style="font-size:1.4rem;font-weight:900;color:var(--navy);">
+        <em style="font-style:normal;color:var(--primary);">i</em>VOTE
+      </span>
+    </div>
+
+    <h1 style="font-size:1.4rem;font-weight:800;color:var(--navy);margin-bottom:.25rem;">
+      {{ election.title }}
+    </h1>
+    <p style="color:#6b7280;font-size:.85rem;margin-bottom:1.5rem;">
+      Your vote is secret and anonymous.
+    </p>
+
+    {% if errors %}
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+        {% for error in errors %}
+          <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'voting:submit_vote' roll.token %}">
+      {% csrf_token %}
+
+      {% for contest in contests %}
+        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;">
+          <h2 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;">
+            {{ contest.title }}
+          </h2>
+          <p style="color:#6b7280;font-size:.8rem;margin-bottom:1rem;">
+            {% if contest.voting_method == 'plurality' %}
+              Select {{ contest.seats }} candidate{{ contest.seats|pluralize }}.
+            {% else %}
+              Rank the candidates in order of preference.
+            {% endif %}
+          </p>
+
+          {% if contest.voting_method == 'plurality' %}
+            {% for candidate in contest.candidates.all %}
+              <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid #e5e7eb;
+                            border-radius:8px;margin-bottom:8px;cursor:pointer;">
+                <input type="{% if contest.seats > 1 %}checkbox{% else %}radio{% endif %}"
+                       name="contest_{{ contest.pk }}" value="{{ candidate.pk }}" style="margin-top:3px;">
+                <span>
+                  <span style="font-weight:600;font-size:.9rem;">{{ candidate.name }}</span><br>
+                  <span style="font-size:.8rem;color:#6b7280;">{{ candidate.description }}</span>
+                </span>
+              </label>
+            {% endfor %}
+          {% else %}
+            {% for candidate in contest.candidates.all %}
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;
+                          border:1px solid #e5e7eb;border-radius:8px;margin-bottom:8px;">
+                <span>
+                  <span style="font-weight:600;font-size:.9rem;">{{ candidate.name }}</span><br>
+                  <span style="font-size:.8rem;color:#6b7280;">{{ candidate.description }}</span>
+                </span>
+                <select name="rank_{{ contest.pk }}_{{ candidate.pk }}"
+                        style="border:1px solid #e5e7eb;border-radius:6px;padding:6px 10px;">
+                  <option value="">—</option>
+                  {# contest.rank_range should be provided by the view/model as range(1, candidates.count+1) #}
+                  {% for rank in contest.rank_range %}
+                    <option value="{{ rank }}">{{ rank }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:.5rem;">
+        Submit Ballot
+      </button>
+    </form>
+
+    <p style="text-align:center;color:#9ca3af;font-size:.75rem;margin-top:1.5rem;">
+      Your vote is encrypted and anonymous. Once submitted it cannot be changed.
+    </p>
+
+  </div>
+
+</body>
+</html>
+

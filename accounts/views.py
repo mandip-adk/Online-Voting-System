@@ -49,12 +49,35 @@ def home(request):
     return render(request, 'home.html')
 
 
-
 @login_required
 def organizer_dashboard(request):
     if request.user.role not in ('organizer', 'admin') and not request.user.is_superuser:
         return redirect('home')
-    return render(request, 'accounts/organizer_dashboard.html')
+
+    from voting.models import Election
+
+    elections = Election.objects.filter(created_by=request.user).order_by('-start_date')
+    for e in elections:
+        e.sync_status()
+    elections = Election.objects.filter(created_by=request.user).order_by('-start_date')
+
+    items = []
+    total_vote_cast = 0
+    for e in elections:
+        roll = e.electoral_roll.all()
+        voted = roll.filter(used=True).count()
+        total = roll.count()
+        items.append({'election': e, 'voted': voted, 'total': total})
+        total_vote_cast += voted
+
+    return render(request, 'voting/dashboard/organizer_dashboard.html', {
+        'election_with_vote_count': items,
+        'total_elections': elections.count(),
+        'active_count':    elections.filter(status='active').count(),
+        'pending_count':   elections.filter(status='pending').count(),
+        'closed_count':    elections.filter(status='closed').count(),
+        'total_vote_cast': total_vote_cast,
+    })
 
 
 @login_required
@@ -68,11 +91,12 @@ def admin_dashboard(request):
         is_superuser=False
     ).order_by('-date_joined')[:10]
 
-    return render(request, 'accounts/admin_dashboard.html', {
+    return render(request, 'voting/dashboard/admin_dashboard.html', {
         'total_organizers': total_organizers,
         'total_admins':     total_admins,
         'recent_users':     recent_users,
     })
+
 
 def contact_us(request):
     from .forms import ContactForm
@@ -115,4 +139,3 @@ def privacy_policy_view(request):
 
 def terms_of_service_view(request):
     return render(request, 'terms_of_service.html')
-
