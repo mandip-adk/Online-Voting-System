@@ -40,32 +40,31 @@ class ContestForm(forms.ModelForm):
         model  = Contest
         fields = ['title', 'voting_method', 'seats', 'order']
         widgets = {
-            'title':         forms.TextInput(attrs={
-                'class':       'form-control',
-                'placeholder': 'e.g. President, Vice President, Approve Budget...',
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. President, Vice President, Treasurer...',
             }),
             'voting_method': forms.Select(attrs={
                 'class': 'form-control',
             }),
-            'seats':         forms.NumberInput(attrs={
+            'seats': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'min':   1,
+                'min': 1,
             }),
-            'order':         forms.NumberInput(attrs={
+            'order': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'min':   0,
+                'min': 0,
             }),
         }
         labels = {
             'seats': 'Number of Winners',
-            'order': 'Display Order (0 = first)',
+            'order': 'Display Order on Ballot',
         }
-
-    def clean_seats(self):
-        seats = self.cleaned_data.get('seats')
-        if seats and seats < 1:
-            raise forms.ValidationError("Must have at least 1 winner.")
-        return seats
+        help_texts = {
+            'seats': 'How many candidates win this contest? Most elections use 1.',
+            'order': 'Which position should this contest appear on the ballot? 0 = first, 1 = second, etc.',
+        }
+        
 
 
 class ContestCandidateForm(forms.ModelForm):

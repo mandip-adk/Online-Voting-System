@@ -10,16 +10,25 @@
 <main class="page-wrapper page-wrapper-narrow">
 
   <div class="breadcrumb">
-    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a> /
-    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a> /
-    <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a> /
+    <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+    <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+    <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a>
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
     <span class="bc-current">Add Contest</span>
   </div>
 
   <div class="auth-form" style="max-width:680px;margin:0 auto;">
     <h1 style="font-size:1.4rem;font-weight:700;margin-bottom:.25rem;">Add Contest</h1>
     <p style="color:#6b7280;font-size:.9rem;margin-bottom:1.5rem;">
-      Create a new contest (race) for <strong>{{ election.title }}</strong>.
+      Create a new contest (race) for <strong style="color:#1A1A3E;">{{ election.title }}</strong>.
     </p>
 
     <div class="vote-notice" style="margin-bottom:1.5rem;">
@@ -41,50 +50,98 @@
     <form method="POST">
       {% csrf_token %}
 
+      <!-- TITLE -->
       <div class="form-group">
-        <label class="form-label">Contest Title</label>
-        <div class="input-wrapper">
-          {{ form.title }}
-        </div>
+        <label class="form-label">Contest Title <span style="color:#EF4444;">*</span></label>
+        <div class="input-wrapper">{{ form.title }}</div>
       </div>
 
+      <!-- VOTING METHOD -->
       <div class="form-group">
-        <label class="form-label">Voting Method</label>
-        <div class="form-row" style="gap:12px;">
-          <label style="flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:14px;cursor:pointer;display:block;">
+        <label class="form-label">Voting Method <span style="color:#EF4444;">*</span></label>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+
+          <label style="border:1.5px solid #e5e7eb;border-radius:10px;padding:14px 16px;
+                        cursor:pointer;display:flex;align-items:flex-start;gap:12px;
+                        transition:border-color .2s;" id="label-plurality">
             <input type="radio" name="{{ form.voting_method.html_name }}" value="plurality"
                    {% if form.voting_method.value == 'plurality' or not form.voting_method.value %}checked{% endif %}
-                   style="margin-right:8px;">
-            ☑️ Traditional Plurality
-            <div style="font-size:.8rem;color:#6b7280;margin-top:4px;">One vote per voter, most votes wins.</div>
+                   onchange="highlightMethod(this)"
+                   style="margin-top:3px;accent-color:var(--primary);">
+            <div>
+              <div style="font-weight:700;font-size:.95rem;">☑️ Traditional Plurality</div>
+              <div style="font-size:.82rem;color:#6b7280;margin-top:3px;">
+                Voters check a box to select their candidate. The candidate(s) with the most votes win.
+                Best for most standard elections.
+              </div>
+            </div>
           </label>
-          <label style="flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:14px;cursor:pointer;display:block;">
+
+          <label style="border:1.5px solid #e5e7eb;border-radius:10px;padding:14px 16px;
+                        cursor:pointer;display:flex;align-items:flex-start;gap:12px;
+                        transition:border-color .2s;" id="label-ranked_choice">
             <input type="radio" name="{{ form.voting_method.html_name }}" value="ranked_choice"
                    {% if form.voting_method.value == 'ranked_choice' %}checked{% endif %}
-                   style="margin-right:8px;">
-            🔢 Ranked-Choice Voting
-            <div style="font-size:.8rem;color:#6b7280;margin-top:4px;">Voters rank candidates by preference.</div>
+                   onchange="highlightMethod(this)"
+                   style="margin-top:3px;accent-color:var(--primary);">
+            <div>
+              <div style="font-weight:700;font-size:.95rem;">🔢 Ranked-Choice Voting</div>
+              <div style="font-size:.82rem;color:#6b7280;margin-top:3px;">
+                Voters rank candidates in order of preference (1st, 2nd, 3rd...).
+                Fairer results when there are multiple candidates.
+              </div>
+            </div>
           </label>
+
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group" style="flex:1;">
-          <label class="form-label">Seats</label>
-          <div class="input-wrapper">{{ form.seats }}</div>
-        </div>
-        <div class="form-group" style="flex:1;">
-          <label class="form-label">Order</label>
-          <div class="input-wrapper">{{ form.order }}</div>
-        </div>
+      <!-- SEATS -->
+      <div class="form-group mt-4">
+        <label class="form-label">Number of Winners <span style="color:#EF4444;">*</span></label>
+        <div class="input-wrapper">{{ form.seats }}</div>
+        <p style="font-size:.78rem;color:#6b7280;margin-top:5px;">
+          How many candidates win this contest?
+          Most positions use <strong>1</strong> (e.g. one President).
+          Use more if you're electing multiple people (e.g. 3 Board Members in one contest).
+        </p>
+      </div>
+
+      <!-- ORDER -->
+      <div class="form-group mt-4">
+        <label class="form-label">Display Order on Ballot</label>
+        <div class="input-wrapper">{{ form.order }}</div>
+        <p style="font-size:.78rem;color:#6b7280;margin-top:5px;">
+          Which position should this contest appear on the ballot?
+          <strong>0</strong> = first, <strong>1</strong> = second, and so on.
+          Lower numbers appear higher on the ballot.
+        </p>
       </div>
 
       <div style="display:flex;gap:1rem;margin-top:1.5rem;">
-        <a href="{% url 'voting:election_detail' election.pk %}" class="btn btn-outline btn-lg" style="flex:1;">Cancel</a>
-        <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">Add Contest</button>
+        <a href="{% url 'voting:election_detail' election.pk %}"
+           class="btn btn-outline btn-lg" style="flex:1;">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">
+          Add Contest
+        </button>
       </div>
     </form>
   </div>
 
 </main>
+
+<script>
+  function highlightMethod(radio) {
+    document.getElementById('label-plurality').style.borderColor =
+      radio.value === 'plurality' ? 'var(--primary)' : '#e5e7eb';
+    document.getElementById('label-ranked_choice').style.borderColor =
+      radio.value === 'ranked_choice' ? 'var(--primary)' : '#e5e7eb';
+  }
+  // Init highlight on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const checked = document.querySelector('input[name="{{ form.voting_method.html_name }}"]:checked');
+    if (checked) highlightMethod(checked);
+  });
+</script>
 {% endblock %}
+

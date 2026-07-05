@@ -4,6 +4,96 @@
 {% block head %}
   <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <style>
+    /* ── Stat Cards Grid ── */
+    .od-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+    .od-stat-card {
+      border-radius: 14px;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1.5px solid transparent;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .od-stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.10);
+    }
+    .od-stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .od-stat-num {
+      font-size: 2rem; font-weight: 900; line-height: 1;
+    }
+    .od-stat-label {
+      font-size: .82rem; font-weight: 600; opacity: .75; margin-top: 2px;
+    }
+    /* colours */
+    .od-card-blue   { background:#EEF0FF; border-color:#C7CDFB; color:#3A4FD7; }
+    .od-card-green  { background:#ECFDF5; border-color:#A7F3D0; color:#059669; }
+    .od-card-yellow { background:#FFFBEB; border-color:#FDE68A; color:#D97706; }
+    .od-card-red    { background:#FEF2F2; border-color:#FECACA; color:#DC2626; }
+    .od-card-purple { background:#F5F3FF; border-color:#DDD6FE; color:#7C3AED; }
+
+    /* ── Election rows ── */
+    .od-election-row {
+      display: flex; align-items: center;
+      gap: 16px; padding: 16px 20px;
+      background: #fff; border-radius: 12px;
+      border: 1.5px solid #E5E7EB;
+      margin-bottom: 10px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .od-election-row:hover {
+      border-color: var(--primary, #3A4FD7);
+      box-shadow: 0 4px 16px rgba(58,79,215,.08);
+    }
+    .od-election-row.row-active { border-left: 4px solid #059669; }
+    .od-election-row.row-closed { opacity: .75; }
+
+    .od-row-info { flex: 1; min-width: 0; }
+    .od-row-title {
+      font-size: 1rem; font-weight: 700;
+      color: #1A1A3E; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .od-row-meta {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: center; margin-top: 5px;
+      font-size: .8rem; color: #6B7280;
+    }
+    .od-row-actions {
+      display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
+    }
+
+    /* ── Progress bar ── */
+    .od-progress-wrap { margin-top: 6px; }
+    .od-progress-bar {
+      height: 5px; background: #E5E7EB; border-radius: 4px; overflow: hidden;
+    }
+    .od-progress-fill {
+      height: 100%; background: var(--primary, #3A4FD7);
+      border-radius: 4px; transition: width .4s;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .od-stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .od-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .od-election-row { flex-direction: column; align-items: flex-start; }
+      .od-row-actions { width: 100%; justify-content: flex-start; }
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -11,15 +101,14 @@
 
   <!-- WELCOME HEADER -->
   <div class="dashboard-header">
-    <div class="dash-welcome">
-      <div class="dash-avatar">
-        {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
-      </div>
-      <div>
-        <p class="dash-greeting">Welcome back,</p>
-        <h1 class="dash-name">{{ user.get_full_name|default:user.email }} 👋</h1>
-        {% if user.organization_name %}<p class="dash-greeting" style="margin-top:2px;">{{ user.organization_name }}{% if user.country %} · {{ user.country }}{% endif %}</p>{% endif %}
-      </div>
+    <div>
+      <p class="dash-greeting">Welcome back,</p>
+      <h1 class="dash-name">{{ user.get_full_name|default:user.email }} 👋</h1>
+      {% if user.organization_name %}
+        <p class="dash-greeting" style="margin-top:3px;font-size:.88rem;color:#6B7280;">
+          🏢 {{ user.organization_name }}{% if user.country %} &nbsp;·&nbsp; 🌏 {{ user.country }}{% endif %}
+        </p>
+      {% endif %}
     </div>
     <a href="{% url 'voting:create_election' %}" class="btn btn-primary">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -30,133 +119,174 @@
   </div>
 
   <!-- STAT CARDS -->
-  <div class="dash-stats-row">
+  <div class="od-stats-grid">
 
-    <div class="dash-stat-card">
-      <div class="dsc-icon" style="background:rgba(58,79,215,.1);color:var(--primary)">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    <div class="od-stat-card od-card-blue">
+      <div class="od-stat-icon" style="background:rgba(58,79,215,.15);">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#3A4FD7" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+               M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
       </div>
       <div>
-        <div class="dsc-num">{{ total_elections }}</div>
-        <div class="dsc-label">Total Elections</div>
+        <div class="od-stat-num">{{ total_elections }}</div>
+        <div class="od-stat-label">Total Elections</div>
       </div>
     </div>
 
-    <div class="dash-stat-card">
-      <div class="dsc-icon" style="background:rgba(16,185,129,.1);color:#059669">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    <div class="od-stat-card od-card-green">
+      <div class="od-stat-icon" style="background:rgba(5,150,105,.15);">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
       <div>
-        <div class="dsc-num">{{ active_count }}</div>
-        <div class="dsc-label">Active</div>
+        <div class="od-stat-num">{{ active_count }}</div>
+        <div class="od-stat-label">Active</div>
       </div>
     </div>
 
-    <div class="dash-stat-card">
-      <div class="dsc-icon" style="background:rgba(245,158,11,.1);color:#D97706">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    <div class="od-stat-card od-card-yellow">
+      <div class="od-stat-icon" style="background:rgba(217,119,6,.15);">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#D97706" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
       <div>
-        <div class="dsc-num">{{ pending_count }}</div>
-        <div class="dsc-label">Pending</div>
+        <div class="od-stat-num">{{ pending_count }}</div>
+        <div class="od-stat-label">Pending</div>
       </div>
     </div>
 
-    <div class="dash-stat-card">
-      <div class="dsc-icon" style="background:rgba(239,68,68,.1);color:#DC2626">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    <div class="od-stat-card od-card-red">
+      <div class="od-stat-icon" style="background:rgba(220,38,38,.15);">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#DC2626" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
       <div>
-        <div class="dsc-num">{{ closed_count }}</div>
-        <div class="dsc-label">Closed</div>
+        <div class="od-stat-num">{{ closed_count }}</div>
+        <div class="od-stat-label">Closed</div>
       </div>
     </div>
 
-    <div class="dash-stat-card">
-      <div class="dsc-icon" style="background:rgba(139,92,246,.1);color:#7C3AED">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+    <div class="od-stat-card od-card-purple">
+      <div class="od-stat-icon" style="background:rgba(124,58,237,.15);">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#7C3AED" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14
+               a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
         </svg>
       </div>
       <div>
-        <div class="dsc-num">{{ total_vote_cast }}</div>
-        <div class="dsc-label">Total Votes Cast</div>
+        <div class="od-stat-num">{{ total_vote_cast }}</div>
+        <div class="od-stat-label">Total Votes Cast</div>
       </div>
     </div>
 
   </div>
 
+  <!-- MESSAGES -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="voter-banner banner-{% if message.tags == 'success' %}voted{% elif message.tags == 'error' %}closed{% else %}pending{% endif %}"
+           style="margin-bottom:16px;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
 
-
-
-
-  <!-- ELECTIONS TABLE -->
+  <!-- ELECTIONS LIST -->
   <div class="dash-section-header" style="margin-top:2rem;">
     <h2 class="dash-section-title">🗳️ Your Elections</h2>
+    <a href="{% url 'voting:election_list' %}" class="btn btn-ghost btn-sm">
+      View All →
+    </a>
   </div>
 
-  <div class="dash-elections-list">
+  <div>
     {% for item in election_with_vote_count %}
-    <div class="dash-election-row
-      {% if item.election.status == 'closed' %}der-closed{% endif %}
-      {% if item.election.status == 'active' %}der-urgent{% endif %}">
 
-      <div class="der-left">
-        <div class="der-status-dot">
-          <span class="status-dot dot-{{ item.election.status }}"></span>
+    {% with turnout=0 %}
+    <div class="od-election-row
+      {% if item.election.status == 'active' %}row-active
+      {% elif item.election.status == 'closed' %}row-closed{% endif %}">
+
+      <!-- STATUS DOT -->
+      <span class="status-dot dot-{{ item.election.status }}"
+            style="flex-shrink:0;width:10px;height:10px;border-radius:50%;display:block;"></span>
+
+      <!-- INFO -->
+      <div class="od-row-info">
+        <div class="od-row-title">{{ item.election.title }}</div>
+        <div class="od-row-meta">
+          <span>
+            {{ item.election.start_date|date:"M d" }} → {{ item.election.end_date|date:"M d, Y" }}
+          </span>
+          <span>·</span>
+          <span>{{ item.election.contests.count }} contest{{ item.election.contests.count|pluralize }}</span>
+          <span>·</span>
+          <span class="ec-status-badge badge-{{ item.election.status }}"
+                style="padding:2px 10px;font-size:.7rem;">
+            {{ item.election.get_status_display }}
+          </span>
+          <span>·</span>
+          <span>{{ item.voted }}/{{ item.total }} voted</span>
         </div>
-        <div class="der-info">
-          <h3 class="der-title">{{ item.election.title }}</h3>
-          <div class="der-meta">
-            <span>{{ item.election.start_date|date:"M d" }} → {{ item.election.end_date|date:"M d, Y" }}</span>
-            <span class="der-meta-sep">·</span>
-            <span>{{ item.election.contests.count }} contest{{ item.election.contests.count|pluralize }}</span>
-            <span class="der-meta-sep">·</span>
-            <span class="ec-status-badge badge-{{ item.election.status }}" style="padding:2px 10px;font-size:.72rem;">
-              {{ item.election.get_status_display }}
-            </span>
-            <span class="der-meta-sep">·</span>
-            <span>{{ item.voted }} / {{ item.total }} voted</span>
+        {% if item.total > 0 %}
+        <div class="od-progress-wrap">
+          <div class="od-progress-bar">
+            <div class="od-progress-fill"
+                 style="width:{% widthratio item.voted item.total 100 %}%;
+                        {% if item.election.status == 'active' %}background:#059669;
+                        {% elif item.election.status == 'closed' %}background:#6B7280;
+                        {% endif %}">
+            </div>
           </div>
         </div>
+        {% endif %}
       </div>
 
-      <div class="der-right">
+      <!-- ACTIONS -->
+      <div class="od-row-actions">
         <a href="{% url 'voting:election_detail' item.election.pk %}"
-        class="btn btn-outline btn-sm">View</a>
+           class="btn btn-outline btn-sm">View</a>
         <a href="{% url 'voting:election_results' item.election.pk %}"
-        class="btn btn-ghost btn-sm">Results →</a>
+           class="btn btn-ghost btn-sm">Results</a>
         <a href="{% url 'voting:voter_participation' item.election.pk %}"
-        class="btn btn-ghost btn-sm">Voters</a>
+           class="btn btn-ghost btn-sm">Voters</a>
         {% if item.election.status == 'pending' %}
-        <a href="{% url 'voting:edit_election' item.election.pk %}"
-        class="btn btn-outline btn-sm">✏️ Edit</a>
-        <a href="{% url 'voting:delete_election' item.election.pk %}"
-        class="btn btn-sm" style="color:#DC2626;border:1px solid #DC2626;border-radius:8px;padding:6px 12px;">
-       🗑️ Delete
-        </a>
+          <a href="{% url 'voting:edit_election' item.election.pk %}"
+             class="btn btn-outline btn-sm">✏️ Edit</a>
+          <a href="{% url 'voting:delete_election' item.election.pk %}"
+             class="btn btn-sm"
+             style="color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:6px 12px;background:#FEF2F2;">
+            🗑️
+          </a>
         {% endif %}
-        <a href="{% url 'audit:audit_list' %}"
-        class="btn btn-ghost btn-sm">Audits</a>
       </div>
 
     </div>
+    {% endwith %}
 
     {% empty %}
     <div class="empty-state">
+      <div class="empty-icon">
+        <svg width="48" height="48" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+               M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
       <h3 class="empty-title">No elections yet</h3>
       <p class="empty-sub">Create your first election to get started.</p>
-      <a href="{% url 'voting:create_election' %}" class="btn btn-primary" style="margin-top:1rem;">
-        + Create Election
-      </a>
+      <a href="{% url 'voting:create_election' %}" class="btn btn-primary"
+         style="margin-top:1rem;">+ Create Election</a>
     </div>
     {% endfor %}
   </div>
