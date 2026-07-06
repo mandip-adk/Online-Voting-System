@@ -3,7 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm
-from .models import CustomUser
+from .models import CustomUser, PasswordResetOTP
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import timedelta
+
 
 
 def register(request):
@@ -139,3 +144,160 @@ def privacy_policy_view(request):
 
 def terms_of_service_view(request):
     return render(request, 'terms_of_service.html')
+
+
+def forgot_password(request):
+    """Step 1 — User enters email, system sends OTP."""
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+ 
+        if not email:
+            messages.error(request, "Please enter your email address.")
+            return render(request, 'accounts/forgot_password.html')
+ 
+        # Always show the same message whether email exists or not
+        # (prevents email enumeration attacks)
+        try:
+            user = CustomUser.objects.get(email=email)
+ 
+            # Invalidate any existing unused OTPs for this user
+            PasswordResetOTP.objects.filter(
+                user=user, is_used=False
+            ).update(is_used=True)
+ 
+            # Generate new OTP
+            otp        = PasswordResetOTP.generate_otp()
+            expires_at = timezone.now() + timedelta(minutes=10)
+ 
+            PasswordResetOTP.objects.create(
+                user=user,
+                otp=otp,
+                expires_at=expires_at,
+            )
+ 
+            # Send OTP email
+            send_mail(
+                subject="iVote — Your Password Reset OTP",
+                message=(
+                    f"Hello {user.first_name},\n\n"
+                    f"You requested a password reset for your iVote account.\n\n"
+                    f"Your One-Time Password (OTP) is:\n\n"
+                    f"    {otp}\n\n"
+                    f"This OTP is valid for 10 minutes.\n"
+                    f"Do not share this code with anyone.\n\n"
+                    f"If you did not request this, please ignore this email.\n\n"
+                    f"— iVote Team"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=True,
+            )
+ 
+        except CustomUser.DoesNotExist:
+            messages.error(
+                request,
+                "Unable to send OTP. Please check the email address and try again."
+            )
+            return render(request, 'accounts/forgot_password.html')
+            
+ 
+        # Store email in session for next step
+        request.session['reset_email'] = email
+ 
+        messages.success(
+            request,
+            "OTP sent successfully. Please check your inbox (and spam folder)."
+        )
+        return redirect('verify_otp')
+ 
+    return render(request, 'accounts/forgot_password.html')
+ 
+ 
+def verify_otp(request):
+    """Step 2 — User enters the 6-digit OTP."""
+    email = request.session.get('reset_email')
+    if not email:
+        messages.error(request, "Session expired. Please start again.")
+        return redirect('forgot_password')
+ 
+    if request.method == 'POST':
+        otp_entered = request.POST.get('otp', '').strip()
+ 
+        if not otp_entered or not otp_entered.isdigit() or len(otp_entered) != 6:
+            messages.error(request, "Please enter a valid 6-digit OTP.")
+            return render(request, 'accounts/verify_otp.html', {'email': email})
+ 
+        try:
+            user = CustomUser.objects.get(email=email)
+            otp_obj = PasswordResetOTP.objects.filter(
+                user=user,
+                otp=otp_entered,
+                is_used=False,
+            ).order_by('-created_at').first()
+ 
+            if otp_obj and otp_obj.is_valid():
+                # Mark OTP as used
+                otp_obj.is_used = True
+                otp_obj.save(update_fields=['is_used'])
+ 
+                # Store verified flag in session
+                request.session['reset_verified'] = True
+                return redirect('reset_password')
+            else:
+                messages.error(
+                    request,
+                    "Invalid or expired OTP. Please try again or request a new one."
+                )
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Something went wrong. Please start again.")
+            return redirect('forgot_password')
+ 
+    return render(request, 'accounts/verify_otp.html', {'email': email})
+ 
+ 
+def reset_password(request):
+    """Step 3 — User sets a new password."""
+    email    = request.session.get('reset_email')
+    verified = request.session.get('reset_verified')
+ 
+    if not email or not verified:
+        messages.error(request, "Session expired. Please start again.")
+        return redirect('forgot_password')
+ 
+    if request.method == 'POST':
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+ 
+        if not password1 or not password2:
+            messages.error(request, "Please fill in both password fields.")
+            return render(request, 'accounts/reset_password.html')
+ 
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+            return render(request, 'accounts/reset_password.html')
+ 
+        if len(password1) < 8:
+            messages.error(request, "Password must be at least 8 characters.")
+            return render(request, 'accounts/reset_password.html')
+ 
+        try:
+            user = CustomUser.objects.get(email=email)
+            user.set_password(password1)
+            user.save(update_fields=['password'])
+ 
+            # Clear session
+            del request.session['reset_email']
+            del request.session['reset_verified']
+ 
+            messages.success(
+                request,
+                "Password reset successfully. You can now log in with your new password."
+            )
+            return redirect('login')
+ 
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Something went wrong. Please start again.")
+            return redirect('forgot_password')
+ 
+    return render(request, 'accounts/reset_password.html')
+

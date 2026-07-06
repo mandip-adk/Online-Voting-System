@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils import timezone
+import random
 
 
 class CustomUserManager(BaseUserManager):
@@ -34,9 +36,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     organization_name = models.CharField(max_length=200, blank=True)
     country           = models.CharField(max_length=100, blank=True)
 
-    is_active  = models.BooleanField(default=True)
-    is_staff   = models.BooleanField(default=False)
-
+    is_active   = models.BooleanField(default=True)
+    is_staff    = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
@@ -49,5 +50,26 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.email} ({self.role})"
+
+
+class PasswordResetOTP(models.Model):
+    user       = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                                   related_name='password_reset_otps')
+    otp        = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used    = models.BooleanField(default=False)
+
+    def is_valid(self):
+        """Returns True if OTP is not used and not expired."""
+        return not self.is_used and timezone.now() < self.expires_at
+
+    @classmethod
+    def generate_otp(cls):
+        """Generate a random 6-digit OTP."""
+        return str(random.randint(100000, 999999))
+
+    def __str__(self):
+        return f"OTP for {self.user.email} ({'valid' if self.is_valid() else 'expired/used'})"
     
     

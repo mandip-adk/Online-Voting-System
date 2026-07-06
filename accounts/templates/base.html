@@ -103,9 +103,9 @@
 
     <ul class="navbar-nav">
       <li><a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
-      <li><a href="{% url 'home' %}#about" class="nav-link">About</a></li>
-      <li><a href="#contact" class="nav-link">Contact Us</a></li>
-      <li><a href="#" class="nav-link">FAQs</a></li>
+      <li><a href="{% url 'about' %}" class="nav-link">About</a></li>
+      <li><a href="{% url 'contact' %}" class="nav-link">Contact Us</a></li>
+      <li><a href="{% url 'faqs' %}" class="nav-link">FAQs</a></li>
     </ul>
 
     <div class="navbar-actions">
@@ -220,9 +220,9 @@
         <div class="footer-links-col">
           <h4 class="footer-col-title">Legal</h4>
           <ul class="footer-link-list">
-            <li><a href="#">Terms and Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">FAQs</a></li>
+            <li><a href="{% url 'terms_of_service' %}">Terms and Conditions</a></li>
+            <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'faqs' %}">FAQs</a></li>
           </ul>
         </div>
 
