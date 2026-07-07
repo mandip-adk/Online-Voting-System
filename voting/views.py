@@ -540,7 +540,6 @@ def ballot(request, token):
     election = roll.election
     election.sync_status()
 
-    # Guard checks
     if roll.used:
         return render(request, 'voting/ballot_used.html', {'election': election})
     if election.status == 'closed':
@@ -548,9 +547,7 @@ def ballot(request, token):
     if election.status == 'pending':
         return render(request, 'voting/ballot_pending.html', {'election': election})
 
-    contests = _attach_rank_ranges(
-        election.contests.prefetch_related('candidates').all()
-    )
+    contests = election.contests.prefetch_related('candidates').all()
     return render(request, 'voting/ballot.html', {
         'roll':     roll,
         'election': election,

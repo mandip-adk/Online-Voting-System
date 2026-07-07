@@ -61,14 +61,18 @@ class Contest(models.Model):
 
 
 class ContestCandidate(models.Model):
-
     contest     = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='candidates')
     name        = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    order       = models.PositiveIntegerField(default=0)  # display order on ballot
+    order       = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['order']
+
+    @property
+    def rank_options(self):
+        """Returns range 1..total_candidates for ranked-choice dropdowns."""
+        return range(1, self.contest.candidates.count() + 1)
 
     def __str__(self):
         return f"{self.name} ({self.contest.title})"

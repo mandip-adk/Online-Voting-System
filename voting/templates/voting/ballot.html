@@ -8,99 +8,304 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+  <style>
+    :root {
+      --primary: #3A4FD7;
+      --navy:    #1A1A3E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #F8F7FF;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem 1rem;
+    }
+    .ballot-wrap {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    /* ── Invitation Banner ── */
+    .invite-banner {
+      background: linear-gradient(135deg, #3A4FD7, #6B5CE7);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      color: white;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .invite-icon {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .invite-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .invite-meta {
+      font-size: .82rem;
+      opacity: .85;
+      line-height: 1.6;
+    }
+    .invite-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .72rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    /* ── Ballot card ── */
+    .ballot-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+
+    /* ── Logo ── */
+    .ballot-logo {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .ballot-logo-mark {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      border-radius: 10px 10px 10px 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ballot-logo-mark span {
+      color: white; font-weight: 900;
+      font-style: italic; font-size: 1rem;
+    }
+    .ballot-logo-text {
+      font-size: 1.3rem; font-weight: 900; color: var(--navy);
+    }
+    .ballot-logo-text em { font-style: normal; color: var(--primary); }
+
+    /* ── Contest card ── */
+    .contest-block {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .contest-title {
+      font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 4px;
+    }
+    .contest-method {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .method-plurality { background: #EEF0FF; color: var(--primary); }
+    .method-ranked    { background: #F5F3FF; color: #7C3AED; }
+
+    /* ── Candidate option ── */
+    .candidate-option {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .candidate-option:hover { background: #F8F7FF; border-color: var(--primary); }
+    .candidate-option input { margin-top: 3px; accent-color: var(--primary); }
+    .candidate-name  { font-weight: 600; font-size: .92rem; color: var(--navy); }
+    .candidate-desc  { font-size: .8rem; color: #6b7280; margin-top: 2px; }
+
+    /* ── Ranked option ── */
+    .ranked-option {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .ranked-option select {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: .88rem;
+      font-family: 'Inter', sans-serif;
+      accent-color: var(--primary);
+      min-width: 80px;
+      cursor: pointer;
+    }
+    .ranked-option select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: .5rem;
+      font-family: 'Inter', sans-serif;
+      transition: background .2s, transform .1s;
+    }
+    .submit-btn:hover  { background: #2B3DB8; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* ── Footer note ── */
+    .ballot-footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: .75rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .ballot-card { padding: 1.5rem 1.25rem; }
+      .invite-banner { flex-direction: column; gap: 12px; }
+    }
+  </style>
 </head>
-<body style="min-height:100vh;display:flex;align-items:center;justify-content:center;
-             background:#F8F7FF;font-family:'Inter',sans-serif;padding:2rem 1rem;">
+<body>
+<div class="ballot-wrap">
 
-  <div style="max-width:640px;width:100%;background:white;border-radius:16px;padding:2.5rem;
-              box-shadow:0 4px 24px rgba(0,0,0,.06);">
-
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
-      <div style="width:36px;height:36px;background:var(--primary);border-radius:10px 10px 10px 0;
-                  display:flex;align-items:center;justify-content:center;">
-        <span style="color:white;font-weight:900;font-style:italic;font-size:1rem;">i</span>
+  <!-- ── INVITATION BANNER ── -->
+  <div class="invite-banner">
+    <div class="invite-icon">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="invite-title">You have been invited to vote</div>
+      <div class="invite-meta">
+        <strong>{{ election.title }}</strong><br>
+        Organized by {{ election.created_by.get_full_name|default:election.created_by.email }}
+        {% if election.created_by.organization_name %}
+          · {{ election.created_by.organization_name }}
+        {% endif %}<br>
+        Voting closes {{ election.end_date|date:"F d, Y · g:i A" }}
       </div>
-      <span style="font-size:1.4rem;font-weight:900;color:var(--navy);">
-        <em style="font-style:normal;color:var(--primary);">i</em>VOTE
-      </span>
+      <span class="invite-badge">🔒 Your vote is secret and anonymous</span>
+    </div>
+  </div>
+
+  <!-- ── BALLOT CARD ── -->
+  <div class="ballot-card">
+
+    <!-- Logo -->
+    <div class="ballot-logo">
+      <div class="ballot-logo-mark"><span>i</span></div>
+      <span class="ballot-logo-text"><em>i</em>VOTE</span>
     </div>
 
-    <h1 style="font-size:1.4rem;font-weight:800;color:var(--navy);margin-bottom:.25rem;">
+    <h1 style="font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:4px;">
       {{ election.title }}
     </h1>
     <p style="color:#6b7280;font-size:.85rem;margin-bottom:1.5rem;">
-      Your vote is secret and anonymous.
+      Complete all contests below then click Submit Ballot.
+      {% if contests|length > 1 %}
+        This ballot has {{ contests|length }} contests.
+      {% endif %}
     </p>
 
+    <!-- Error block -->
     {% if errors %}
-      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-        {% for error in errors %}
-          <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">{{ error }}</p>
-        {% endfor %}
-      </div>
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;
+                padding:12px 16px;margin-bottom:16px;">
+      {% for error in errors %}
+        <p style="color:#DC2626;font-size:.85rem;margin:2px 0;">⚠ {{ error }}</p>
+      {% endfor %}
+    </div>
     {% endif %}
 
     <form method="POST" action="{% url 'voting:submit_vote' roll.token %}">
       {% csrf_token %}
 
       {% for contest in contests %}
-        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;">
-          <h2 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;">
-            {{ contest.title }}
-          </h2>
-          <p style="color:#6b7280;font-size:.8rem;margin-bottom:1rem;">
-            {% if contest.voting_method == 'plurality' %}
-              Select {{ contest.seats }} candidate{{ contest.seats|pluralize }}.
-            {% else %}
-              Rank the candidates in order of preference.
-            {% endif %}
-          </p>
+      <div class="contest-block">
 
+        <div class="contest-title">{{ contest.title }}</div>
+
+        <span class="contest-method {% if contest.voting_method == 'plurality' %}method-plurality{% else %}method-ranked{% endif %}">
           {% if contest.voting_method == 'plurality' %}
-            {% for candidate in contest.candidates.all %}
-              <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid #e5e7eb;
-                            border-radius:8px;margin-bottom:8px;cursor:pointer;">
-                <input type="{% if contest.seats > 1 %}checkbox{% else %}radio{% endif %}"
-                       name="contest_{{ contest.pk }}" value="{{ candidate.pk }}" style="margin-top:3px;">
-                <span>
-                  <span style="font-weight:600;font-size:.9rem;">{{ candidate.name }}</span><br>
-                  <span style="font-size:.8rem;color:#6b7280;">{{ candidate.description }}</span>
-                </span>
-              </label>
-            {% endfor %}
+            ☑️ Plurality · Select {{ contest.seats }} winner{{ contest.seats|pluralize }}
           {% else %}
-            {% for candidate in contest.candidates.all %}
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;
-                          border:1px solid #e5e7eb;border-radius:8px;margin-bottom:8px;">
-                <span>
-                  <span style="font-weight:600;font-size:.9rem;">{{ candidate.name }}</span><br>
-                  <span style="font-size:.8rem;color:#6b7280;">{{ candidate.description }}</span>
-                </span>
-                <select name="rank_{{ contest.pk }}_{{ candidate.pk }}"
-                        style="border:1px solid #e5e7eb;border-radius:6px;padding:6px 10px;">
-                  <option value="">—</option>
-                  {# contest.rank_range should be provided by the view/model as range(1, candidates.count+1) #}
-                  {% for rank in contest.rank_range %}
-                    <option value="{{ rank }}">{{ rank }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            {% endfor %}
+            🔢 Ranked-Choice · Rank candidates by preference
           {% endif %}
-        </div>
+        </span>
+
+        {% if contest.voting_method == 'plurality' %}
+
+          {% for candidate in contest.candidates.all %}
+          <label class="candidate-option">
+            <input type="{% if contest.seats > 1 %}checkbox{% else %}radio{% endif %}"
+                   name="contest_{{ contest.pk }}"
+                   value="{{ candidate.pk }}">
+            <span>
+              <div class="candidate-name">{{ candidate.name }}</div>
+              {% if candidate.description %}
+                <div class="candidate-desc">{{ candidate.description }}</div>
+              {% endif %}
+            </span>
+          </label>
+          {% empty %}
+          <p style="color:#9ca3af;font-size:.85rem;padding:8px 0;">No candidates added yet.</p>
+          {% endfor %}
+
+        {% else %}
+
+          {% for candidate in contest.candidates.all %}
+          <div class="ranked-option">
+            <span>
+              <div class="candidate-name">{{ candidate.name }}</div>
+              {% if candidate.description %}
+                <div class="candidate-desc">{{ candidate.description }}</div>
+              {% endif %}
+            </span>
+            <select name="rank_{{ contest.pk }}_{{ candidate.pk }}">
+              <option value="">— Rank —</option>
+              {% for rank in candidate.rank_options %}
+                <option value="{{ rank }}">{{ rank }}{% if rank == 1 %}st{% elif rank == 2 %}nd{% elif rank == 3 %}rd{% else %}th{% endif %} choice</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% empty %}
+          <p style="color:#9ca3af;font-size:.85rem;padding:8px 0;">No candidates added yet.</p>
+          {% endfor %}
+
+        {% endif %}
+      </div>
       {% endfor %}
 
-      <button type="submit" class="btn btn-primary btn-full" style="margin-top:.5rem;">
-        Submit Ballot
+      <button type="submit" class="submit-btn">
+        🗳️ Submit Ballot
       </button>
+
     </form>
 
-    <p style="text-align:center;color:#9ca3af;font-size:.75rem;margin-top:1.5rem;">
-      Your vote is encrypted and anonymous. Once submitted it cannot be changed.
+    <p class="ballot-footer">
+      Your vote is encrypted and anonymous. Once submitted it cannot be changed.<br>
+      Token: {{ roll.token }}
     </p>
 
   </div>
-
+</div>
 </body>
 </html>
 
