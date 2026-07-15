@@ -11,6 +11,7 @@ from .forms import (
     ElectionForm, ContestForm, ContestCandidateForm,
     CSVUploadForm, EmailListForm
 )
+import traceback
 
 
 # ─────────────────────────────────────────
@@ -493,7 +494,9 @@ def send_voting_emails(request, pk):
                     fail_silently=False,
                 )
                 sent += 1
-            except Exception:
+            except Exception as e:
+                print("EMAIL ERROR:", repr(e))
+                traceback.print_exc()
                 failed += 1
 
         election.emails_sent = True
