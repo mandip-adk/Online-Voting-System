@@ -12,12 +12,16 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()  # loads .env file
+from decouple import config
 
 if os.environ.get('DJANGO_ENV') == 'production':
     EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST          = 'smtp.gmail.com'
     EMAIL_PORT          = 587
     EMAIL_USE_TLS       = True
+    EMAIL_TIMEOUT       = 10
     EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
     DEFAULT_FROM_EMAIL  = os.environ.get('EMAIL_HOST_USER')
@@ -25,11 +29,13 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     DEFAULT_FROM_EMAIL = 'noreply@ivote.com'
 
+print("EMAIL_HOST_USER =", EMAIL_HOST_USER)
+print("EMAIL_HOST_PASSWORD exists =", bool(EMAIL_HOST_PASSWORD))
+print("EMAIL_BACKEND =", EMAIL_BACKEND)
 
-from dotenv import load_dotenv
-from decouple import config
 
-load_dotenv()  # loads .env file
+
+
 
 
 
