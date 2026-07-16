@@ -2,78 +2,588 @@
 {% load static %}
 
 {% block head %}
-  <link class="voting-elections-stylesheet" rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/voting_elections.css' %}">
+
+<style>
+
+.results-header{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border-radius:16px;
+    padding:30px;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.results-header h1{
+    margin:0;
+    font-size:2rem;
+    font-weight:700;
+}
+
+.results-header p{
+    margin-top:8px;
+    opacity:.95;
+}
+
+.status-badge{
+    display:inline-block;
+    margin-top:15px;
+    background:#22c55e;
+    color:#fff;
+    padding:8px 16px;
+    border-radius:30px;
+    font-weight:600;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.stat-card{
+    background:#fff;
+    border-radius:14px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+    transition:.25s;
+}
+
+.stat-card:hover{
+    transform:translateY(-4px);
+}
+
+.stat-icon{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.stat-title{
+    color:#64748b;
+    font-weight:600;
+}
+
+.stat-value{
+    font-size:2rem;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.turnout-bar{
+    width:100%;
+    height:12px;
+    background:#e5e7eb;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:15px;
+}
+
+.turnout-fill{
+    height:100%;
+    background:#22c55e;
+}
+
+.section-title{
+    font-size:1.5rem;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+</style>
+
 {% endblock %}
 
 {% block content %}
+
 <main class="page-wrapper">
 
-  <div class="breadcrumb">
+<div class="breadcrumb">
     <a href="{% url 'organizer_dashboard' %}" class="bc-link">Dashboard</a> /
     <a href="{% url 'voting:election_list' %}" class="bc-link">Elections</a> /
     <a href="{% url 'voting:election_detail' election.pk %}" class="bc-link">{{ election.title }}</a> /
-    <span class="bc-current">Participation</span>
-  </div>
+    <span class="bc-current">Results</span>
+</div>
 
-  <div class="form-row" style="gap:1rem;margin-bottom:1.5rem;">
-    <div class="sidebar-widget" style="flex:1;text-align:center;">
-      <div class="sw-title">Invited</div>
-      <div style="font-size:1.6rem;font-weight:700;">{{ total }}</div>
-    </div>
-    <div class="sidebar-widget" style="flex:1;text-align:center;">
-      <div class="sw-title">Voted</div>
-      <div style="font-size:1.6rem;font-weight:700;color:#16A34A;">{{ voted }}</div>
-    </div>
-    <div class="sidebar-widget" style="flex:1;text-align:center;">
-      <div class="sw-title">Not Voted</div>
-      <div style="font-size:1.6rem;font-weight:700;color:#DC2626;">{{ not_voted }}</div>
-    </div>
-    <div class="sidebar-widget" style="flex:1;text-align:center;">
-      <div class="sw-title">Turnout</div>
-      <div style="font-size:1.6rem;font-weight:700;">{{ turnout }}%</div>
-    </div>
-  </div>
+<div class="results-header">
 
-  {% if roll %}
-  <div class="sidebar-widget">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="border-bottom:1px solid #e5e7eb;">
-          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Email</th>
-          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Status</th>
-          <th style="text-align:left;padding:10px;font-size:.8rem;color:#6b7280;">Voted At</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in roll %}
-        <tr style="border-bottom:1px solid #f3f4f6;">
-          <td style="padding:10px;font-size:.85rem;">{{ entry.email }}</td>
-          <td style="padding:10px;">
-            {% if entry.used %}
-              <span class="ec-status-badge badge-active" style="padding:2px 10px;font-size:.72rem;">✓ Voted</span>
-            {% else %}
-              <span class="ec-status-badge badge-closed" style="padding:2px 10px;font-size:.72rem;">✗ Not Voted</span>
-            {% endif %}
-          </td>
-          <td style="padding:10px;font-size:.85rem;color:#6b7280;">
-            {{ entry.used_at|default:"—" }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <div class="empty-icon">🗳️</div>
-    <div class="empty-title">No voters invited yet</div>
-    <div class="empty-sub">
-      <a href="{% url 'voting:upload_electoral_roll' election.pk %}" class="btn btn-primary btn-sm">Upload Electoral Roll</a>
+    <h1>🏆 Election Results</h1>
+
+    <p>
+        <strong>{{ election.title }}</strong><br>
+        Official election summary and vote count.
+    </p>
+
+    {% if election.status == "closed" %}
+        <span class="status-badge">
+            ✅ Election Completed
+        </span>
+    {% elif election.status == "active" %}
+        <span class="status-badge" style="background:#f59e0b;">
+            🟡 Election In Progress
+        </span>
+    {% else %}
+        <span class="status-badge" style="background:#6b7280;">
+            ⏳ Election Pending
+        </span>
+    {% endif %}
+
+</div>
+
+
+<div class="stats-grid">
+
+<div class="stat-card">
+
+<div class="stat-icon">
+👥
+</div>
+
+<div class="stat-title">
+Invited Voters
+</div>
+
+<div class="stat-value">
+{{ total }}
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+🗳️
+</div>
+
+<div class="stat-title">
+Votes Cast
+</div>
+
+<div class="stat-value" style="color:#16a34a;">
+{{ voted }}
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+📊
+</div>
+
+<div class="stat-title">
+Turnout
+</div>
+
+<div class="stat-value">
+{{ turnout }}%
+</div>
+
+<div class="turnout-bar">
+<div class="turnout-fill"
+style="width:{{ turnout }}%;">
+</div>
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+🏁
+</div>
+
+<div class="stat-title">
+Total Contests
+</div>
+
+<div class="stat-value">
+{{ contest_count }}
+</div>
+
+</div>
+
+</div>
+
+<h2 class="section-title">
+Contest Results
+</h2>
+{% if results %}
+
+{% for result in results %}
+
+<div class="sidebar-widget" style="margin-bottom:30px;border-radius:16px;padding:25px;">
+
+    <!-- Contest Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;">
+
+        <div>
+            <h3 style="margin:0;font-size:1.45rem;font-weight:700;">
+                {{ result.contest.title }}
+            </h3>
+
+            <div style="color:#64748b;margin-top:6px;">
+                Voting Method:
+                <strong>{{ result.contest.get_voting_method_display }}</strong>
+            </div>
+        </div>
+
+        <div style="text-align:right;">
+            <div style="font-size:.9rem;color:#64748b;">
+                Total Votes
+            </div>
+
+            <div style="font-size:1.8rem;font-weight:700;color:#2563eb;">
+                {{ result.total_votes }}
+            </div>
+        </div>
+
     </div>
-  </div>
-  {% endif %}
+
+
+    {% if result.candidate_results %}
+
+    <!-- Winner Card -->
+
+    {% with winner=result.candidate_results.0 %}
+
+    <div style="
+        background:linear-gradient(135deg,#22c55e,#16a34a);
+        color:white;
+        border-radius:14px;
+        padding:22px;
+        margin-bottom:25px;
+        box-shadow:0 8px 20px rgba(0,0,0,.12);
+    ">
+
+        <div style="font-size:.9rem;opacity:.95;">
+            🏆 WINNER
+        </div>
+
+        <div style="font-size:1.7rem;font-weight:700;margin-top:8px;">
+            {{ winner.candidate.name }}
+        </div>
+
+        <div style="margin-top:10px;font-size:1.05rem;">
+
+            {{ winner.votes }} vote{{ winner.votes|pluralize }}
+
+            •
+
+            {{ winner.percentage }}%
+
+        </div>
+
+    </div>
+
+    {% endwith %}
+
+
+
+    <!-- Candidate Ranking -->
+
+    {% for row in result.candidate_results %}
+
+    <div style="
+        background:#ffffff;
+        border:1px solid #e5e7eb;
+        border-radius:12px;
+        padding:18px;
+        margin-bottom:16px;
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:12px;
+        ">
+
+            <div style="font-size:1.05rem;font-weight:600;">
+
+                {% if forloop.first %}
+                    🥇
+                {% elif forloop.counter == 2 %}
+                    🥈
+                {% elif forloop.counter == 3 %}
+                    🥉
+                {% else %}
+                    {{ forloop.counter }}.
+                {% endif %}
+
+                {{ row.candidate.name }}
+
+            </div>
+
+            <div>
+
+                <span style="
+                    background:#eff6ff;
+                    color:#2563eb;
+                    padding:6px 12px;
+                    border-radius:30px;
+                    font-weight:700;
+                    font-size:.9rem;
+                ">
+                    {{ row.votes }} vote{{ row.votes|pluralize }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Progress Bar -->
+
+        <div style="
+            width:100%;
+            height:18px;
+            background:#edf2f7;
+            border-radius:20px;
+            overflow:hidden;
+        ">
+
+            <div style="
+                width:{{ row.percentage }}%;
+                height:18px;
+                background:linear-gradient(90deg,#2563eb,#60a5fa);
+                transition:width 1.2s ease;
+            ">
+            </div>
+
+        </div>
+
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-top:8px;
+            font-size:.9rem;
+            color:#64748b;
+        ">
+
+            <span>
+                {{ row.percentage }}%
+            </span>
+
+            <span>
+
+                {% if forloop.first %}
+                    Leading
+                {% else %}
+                    Candidate
+                {% endif %}
+
+            </span>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            🗳️
+        </div>
+
+        <div class="empty-title">
+            No votes have been cast.
+        </div>
+
+        <div class="empty-sub">
+            Results will appear once voting begins.
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="empty-state">
+
+    <div class="empty-icon">
+        📊
+    </div>
+
+    <div class="empty-title">
+        No contests found.
+    </div>
+
+</div>
+
+{% endif %}
+<hr style="margin:40px 0;border:none;border-top:1px solid #e5e7eb;">
+
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
+
+    <div>
+
+        <h2 style="margin:0;font-size:1.5rem;">
+            📈 Vote Distribution
+        </h2>
+
+        <p style="margin-top:6px;color:#64748b;">
+            Visual representation of votes received by each candidate.
+        </p>
+
+    </div>
+
+    <div>
+
+        <button onclick="window.print()"
+            class="btn btn-outline-primary">
+
+            🖨 Print Results
+
+        </button>
+
+        <a href="{% url 'voting:election_detail' election.pk %}"
+           class="btn btn-primary">
+
+            ← Back to Election
+
+        </a>
+
+    </div>
+
+</div>
+
+<br>
+
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+gap:30px;
+">
+
+{% for result in results %}
+
+<div class="sidebar-widget">
+
+    <h3 style="text-align:center;margin-bottom:20px;">
+        {{ result.contest.title }}
+    </h3>
+
+    <div style="max-width:280px;margin:0 auto;">
+    <canvas id="chart{{ forloop.counter }}"></canvas>
+    </div>
+    </canvas>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+{% for result in results %}
+
+new Chart(
+
+document.getElementById("chart{{ forloop.counter }}"),
+
+{
+
+type:'pie',
+
+data:{
+
+labels:[
+
+{% for row in result.candidate_results %}
+
+"{{ row.candidate.name }}",
+
+{% endfor %}
+
+],
+
+datasets:[{
+
+data:[
+
+{% for row in result.candidate_results %}
+
+{{ row.votes }},
+
+{% endfor %}
+
+],
+
+backgroundColor:[
+
+"#2563eb",
+"#16a34a",
+"#f59e0b",
+"#ef4444",
+"#8b5cf6",
+"#06b6d4",
+"#ec4899",
+"#14b8a6",
+"#f97316"
+
+],
+
+borderWidth:2
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+plugins:{
+
+legend:{
+
+position:"bottom"
+
+},
+
+title:{
+
+display:true,
+
+text:"Vote Share"
+
+}
+
+}
+
+}
+
+}
+
+);
+
+{% endfor %}
+
+</script>
 
 </main>
-{% endblock %}
 
+{% endblock %}

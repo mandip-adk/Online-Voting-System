@@ -391,68 +391,111 @@ def voter_participation(request, pk):
 
 @login_required
 def election_results(request, pk):
-    election = get_object_or_404(Election, pk=pk, created_by=request.user)
+    election = get_object_or_404(
+        Election,
+        pk=pk,
+        created_by=request.user
+    )
+
     election.sync_status()
-    contests = election.contests.prefetch_related('candidates').all()
+
+    contests = election.contests.prefetch_related("candidates").all()
 
     results = []
+
     for contest in contests:
+
         candidate_results = []
         total_votes = 0
 
-        if contest.voting_method == 'plurality':
+        if contest.voting_method == "plurality":
+
             for candidate in contest.candidates.all():
-                vote_count = Vote.objects.filter(
+
+                votes = Vote.objects.filter(
                     contest_candidate=candidate
                 ).count()
-                total_votes += vote_count
-                candidate_results.append({
-                    'candidate':  candidate,
-                    'votes':      vote_count,
-                    'percentage': 0,
-                })
-            # calculate percentages
-            for cr in candidate_results:
-                cr['percentage'] = round(
-                    (cr['votes'] / total_votes * 100) if total_votes > 0 else 0, 1
-                )
-            candidate_results.sort(key=lambda x: x['votes'], reverse=True)
 
-        elif contest.voting_method == 'ranked_choice':
-            # First preference counts for display
-            for candidate in contest.candidates.all():
-                vote_count = Vote.objects.filter(
-                    contest_candidate=candidate, rank=1
-                ).count()
-                total_votes += vote_count
+                total_votes += votes
+
                 candidate_results.append({
-                    'candidate':  candidate,
-                    'votes':      vote_count,
-                    'percentage': 0,
+                    "candidate": candidate,
+                    "votes": votes,
+                    "percentage": 0,
                 })
-            for cr in candidate_results:
-                cr['percentage'] = round(
-                    (cr['votes'] / total_votes * 100) if total_votes > 0 else 0, 1
-                )
-            candidate_results.sort(key=lambda x: x['votes'], reverse=True)
+
+        else:   # ranked choice
+
+            for candidate in contest.candidates.all():
+
+                votes = Vote.objects.filter(
+                    contest_candidate=candidate,
+                    rank=1
+                ).count()
+
+                total_votes += votes
+
+                candidate_results.append({
+                    "candidate": candidate,
+                    "votes": votes,
+                    "percentage": 0,
+                })
+
+        # percentages
+        for item in candidate_results:
+            item["percentage"] = round(
+                (item["votes"] / total_votes * 100)
+                if total_votes else 0,
+                1
+            )
+
+        # highest vote first
+        candidate_results.sort(
+            key=lambda x: x["votes"],
+            reverse=True
+        )
+
+        winner = candidate_results[0] if candidate_results else None
+        runner_up = candidate_results[1] if len(candidate_results) > 1 else None
+
+        margin = 0
+        if winner and runner_up:
+            margin = winner["votes"] - runner_up["votes"]
 
         results.append({
-            'contest':          contest,
-            'candidate_results': candidate_results,
-            'total_votes':      total_votes,
+            "contest": contest,
+            "candidate_results": candidate_results,
+            "winner": winner,
+            "runner_up": runner_up,
+            "margin": margin,
+            "total_votes": total_votes,
+            "candidate_count": len(candidate_results),
         })
 
-    roll   = election.electoral_roll.all()
-    voted  = roll.filter(used=True).count()
-    total  = roll.count()
+    roll = election.electoral_roll.all()
 
-    return render(request, 'voting/election_results.html', {
-        'election': election,
-        'results':  results,
-        'voted':    voted,
-        'total':    total,
-        'turnout':  round((voted / total * 100), 1) if total > 0 else 0,
-    })
+    voted = roll.filter(used=True).count()
+    total = roll.count()
+
+    turnout = round(
+        (voted / total * 100)
+        if total else 0,
+        1
+    )
+
+    return render(
+        request,
+        "voting/election_results.html",
+        {
+            "election": election,
+            "results": results,
+            "voted": voted,
+            "total": total,
+            "not_voted": total - voted,
+            "turnout": turnout,
+            "contest_count": contests.count(),
+        },
+    )
 
 
 # ─────────────────────────────────────────
