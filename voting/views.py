@@ -476,24 +476,35 @@ def send_voting_emails(request, pk):
                 f'/voting/vote/{entry.token}/'
             )
             try:
-                send_mail(
-                    subject=f"You are invited to vote — {election.title}",
-                    message=(
-                        f"Dear Voter,\n\n"
-                        f"You have been invited to participate in the following election:\n\n"
-                        f"  {election.title}\n\n"
-                        f"Click the link below to cast your vote:\n"
-                        f"  {ballot_url}\n\n"
-                        f"This link is unique to you. Do not share it.\n"
-                        f"It will expire when the election closes on "
-                        f"{election.end_date.strftime('%B %d, %Y at %I:%M %p')}.\n\n"
-                        f"— iVote Team"
-                    ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[entry.email],
-                    fail_silently=False,
-                )
-                sent += 1
+                print("=" * 50)
+                print("Sending to:", entry.email)
+                print("From:", settings.DEFAULT_FROM_EMAIL)
+
+                result = send_mail(
+                subject=f"You are invited to vote — {election.title}",
+                message=(
+                f"Dear Voter,\n\n"
+                f"You have been invited to participate in the following election:\n\n"
+                f"  {election.title}\n\n"
+                f"Click the link below to cast your vote:\n"
+                f"  {ballot_url}\n\n"
+                f"This link is unique to you. Do not share it.\n"
+                f"It will expire when the election closes on "
+                f"{election.end_date.strftime('%B %d, %Y at %I:%M %p')}.\n\n"
+                f"— iVote Team"
+            ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[entry.email],
+                fail_silently=False,
+            )
+
+                print("SEND RESULT =", result)
+
+                if result == 1:
+                    sent += 1
+                else:
+                    failed += 1
+
             except Exception as e:
                 print("EMAIL ERROR:", repr(e))
                 traceback.print_exc()
