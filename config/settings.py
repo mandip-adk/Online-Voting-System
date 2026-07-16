@@ -173,3 +173,8 @@ STORAGES = {
     },
 }
 
+
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="https://respectful-fulfillment-production-4716.up.railway.app"
+).split(",")
