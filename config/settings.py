@@ -16,26 +16,17 @@ from dotenv import load_dotenv
 load_dotenv()  # loads .env file
 from decouple import config
 
-if os.environ.get('DJANGO_ENV') == 'production':
-    EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST          = 'smtp.gmail.com'
-    EMAIL_PORT          = 587
-    EMAIL_USE_TLS       = True
-    EMAIL_TIMEOUT       = 10
-    EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-    DEFAULT_FROM_EMAIL  = os.environ.get('EMAIL_HOST_USER')
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'noreply@ivote.com'
 
-print("EMAIL_HOST_USER =", EMAIL_HOST_USER)
-print("EMAIL_HOST_PASSWORD exists =", bool(EMAIL_HOST_PASSWORD))
-print("EMAIL_BACKEND =", EMAIL_BACKEND)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_TIMEOUT = 10
 
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
-
-
+DEFAULT_FROM_EMAIL = f"iVote <{EMAIL_HOST_USER}>"
 
 
 
