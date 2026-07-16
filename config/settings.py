@@ -44,7 +44,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', 
-                       default="127.0.0.1,localhost,online-voting-system-9aze.onrender.com").split(',')
+                       default="127.0.0.1,localhost,respectful-fulfillment-production-4716.up.railway.app").split(',')
 
 
 # Application definition
